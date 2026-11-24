@@ -9,6 +9,9 @@
 | Store revisioned JSON with a fixed checklist snapshot | A resuming session reads the same scope after a catalog edit. A changed classification starts a new workspace in version 1. |
 | Use a single Markdown export with traceable sections | One artifact is sufficient to review the first slice and can be reproduced directly from state. |
 | Keep generic physical and legal acceptance scenarios | Domain-neutral behavior can be tested now. Specialized building, process, and contract templates follow the agent-skill pilot. |
+| Require version 1 on every template | Catalog formats can evolve independently of saved workspace state. Custom unversioned templates need a version field. |
+| Compose in a fixed order and give each dimension one owner | Base, primary product, ordered secondary products, and filename-ordered overlays give a reproducible checklist with a source for each dimension. Rejecting duplicate IDs prevents implicit overrides. |
+| Preserve unresolved applicability in inspection | Partial tag facts can leave overlays or dimensions unresolved and surface which facts are missing. A confirmed single-product tag set still produces the existing version 1 checklist for workspace initialization. |
 
 ## Subsequent slices
 

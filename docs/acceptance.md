@@ -16,6 +16,17 @@ of the interview in an agent host that can load the skill.
 | Interrupted interview | A separate process or fresh chat loads the saved revision and decision IDs before continuing. An outdated write is rejected and preserves the newer state. |
 | Invalid catalog | Malformed templates, missing rule references, and duplicate dimensions fail with readable messages. Identical classifications yield the same ordered checklist. |
 
+## Template schema and composition
+
+| Scenario | Acceptance condition |
+| --- | --- |
+| Versioned catalog | All four templates declare version 1. Validation identifies the template and field when a version is missing or unsupported, or when a rule uses an invalid shape or reference. |
+| Multiple products | A fixture catalog composes the base, primary product, secondary products in input order, and applicable overlays in filename order. A secondary product can satisfy an overlay rule. Every dimension identifies its source template. |
+| Overlapping declarations | Repeated dimension IDs identify both declarations. Incompatible definitions identify the fields that differ. Duplicate template IDs and repeated product selections fail validation. |
+| Partial tag facts | For `agent-skill` with undeclared tags, Evaluation applies and Security is unresolved. Declaring either Security tag present applies Security. Declaring both absent excludes it. Contradictory declarations fail with a message naming the tag. |
+| Conditional dimensions | A dimension follows its template and its own rule. An unresolved condition reports missing facts. A false condition excludes the dimension, including when another condition is unresolved. An applicable optional dimension keeps `required: false`. |
+| Confirmed profile and pilot | Existing single-product `compose` and `init` commands produce the version 1 checklist shape. The checked-in pilot state still reproduces its Markdown baseline. |
+
 ## Stakeholder question delivery
 
 Start a fresh interview with a product idea whose classification or tags need

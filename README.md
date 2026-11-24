@@ -161,10 +161,18 @@ Run these commands from the project folder. On Windows PowerShell, use
 
 ```sh
 .venv/bin/python -m src.adp_discovery catalog
+.venv/bin/python -m src.adp_discovery compose --product agent-skill --partial --no-tag sensitive-data
 .venv/bin/python -m src.adp_discovery show .discovery/meeting-decisions/state.json
 .venv/bin/python -m src.adp_discovery report .discovery/meeting-decisions/state.json > .discovery/meeting-decisions/baseline.md
 .venv/bin/python -m src.adp_discovery report .discovery/meeting-decisions/state.json --format json
 ```
+
+The example composition applies Evaluation and shows Security as unresolved
+pending the `external-actions` tag. With `--partial`, use `--tag` for known
+present tags and `--no-tag` for known absent tags. Omitted tags remain
+unresolved. Without `--partial`, omitted tags are treated as absent in the
+confirmed classification. For catalogs with multiple product templates, repeat
+`--secondary-product` in the order you want those templates composed.
 
 Working state and exports placed in `.discovery/` are local and Git-ignored.
 The JSON report contains the readiness findings and blocking record IDs.

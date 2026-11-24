@@ -1,3 +1,4 @@
+version: 1
 id: general
 tags:
   sensitive-data: The product handles sensitive information.

@@ -18,7 +18,7 @@ def parser():
     commands.add_parser("catalog", help="list supported products and tags")
     for name in ("compose", "init"):
         command = commands.add_parser(name, help={
-            "compose": "show the checklist for a confirmed classification",
+            "compose": "inspect a composed discovery checklist",
             "init": "create discovery state and save the checklist",
         }[name])
         command.add_argument("--product", required=True)
@@ -26,6 +26,10 @@ def parser():
         if name == "init":
             command.add_argument("state", type=Path)
             command.add_argument("--title", required=True)
+        else:
+            command.add_argument("--secondary-product", action="append", default=[], help="add a product template")
+            command.add_argument("--partial", action="store_true", help="leave undeclared tags unresolved")
+            command.add_argument("--no-tag", action="append", default=[], help="declare a tag absent in partial inspection")
     for name, help_text in (
         ("show", "load and validate saved state"),
         ("save", "save a complete state document from standard input"),
@@ -52,10 +56,13 @@ def run(options):
         return "Catalog valid.\n"
     if options.command == "catalog":
         return {"products": sorted(catalog.products), "tags": catalog.tags}
-    profile = catalog.compose(options.product, options.tag)
     if options.command == "init":
+        profile = catalog.compose(options.product, options.tag)
         return initialize(options.state, options.title, profile)
-    return profile
+    return catalog.compose(
+        options.product, options.tag,
+        secondary_products=options.secondary_product, partial=options.partial, absent_tags=options.no_tag,
+    )
 
 
 def main():

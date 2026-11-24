@@ -4,7 +4,7 @@
 | --- | --- |
 | Interview skill | Classification proposals, stakeholder confirmation, question selection and delivery, evidence interpretation, and contradiction analysis |
 | Agent host | Availability and presentation of built-in question dialogs |
-| Catalog | Product-neutral and domain-specific dimensions, tag definitions, overlay conditions |
+| Catalog | Product-neutral and domain-specific dimensions, tag definitions, and applicability rules |
 | Python commands | Schema validation, rule evaluation, ordered composition, state integrity, and preliminary evidence coverage |
 | Workspace state | Checklist snapshot, discovery summary, and traceable working records |
 | Generated baseline | A reviewable view of the saved revision, including decisions, gaps, and readiness |
@@ -25,19 +25,51 @@ workspace state.
 
 ## Catalog contract
 
-`templates/base.yaml` defines base dimensions and known tags. One entry in
-`templates/products/` adds product-specific dimensions. Entries in
-`templates/overlays/` add dimensions when their rules match. Template IDs
-match filenames, with `general` reserved for the base. Template IDs and
-dimension IDs are globally unique within the catalog. Validation checks all
-rules, including branches that would short-circuit for a given profile.
+Every catalog YAML file declares `version: 1`. The template schema version is
+independent of the saved-state version. To use an existing unversioned custom
+template, add `version: 1` at its root.
 
-Each rule has exactly one operator. `product` compares the selected product
-ID. `tag` tests membership of a known, confirmed tag. `all` requires each
-child to match, `any` requires at least one, and `not` inverts its child.
-Both list operators require nonempty lists. Missing tags are false after
-the interview confirms the tag set. Dimensions follow base order, product
-order, then overlay filename order and declaration order within each overlay.
+`templates/base.yaml` declares the base dimensions and the known tag IDs and
+descriptions. Each file in `templates/products/` adds product dimensions.
+Each file in `templates/overlays/` must declare a template-level `applies`
+rule. The base uses the reserved ID `general`. Product and overlay IDs match
+their filenames. Template and dimension IDs use lowercase kebab-case and are
+globally unique within the catalog. Repeated dimensions fail validation even
+when their definitions agree or their conditions are mutually exclusive.
+
+A dimension declares an `id`, a `question`, a Boolean `required` flag, and
+an optional `applies` rule. A dimension applies only when both its template
+and its own rule apply. With no dimension rule, it follows its template.
+`required: true` makes coverage mandatory when the dimension applies.
+`required: false` makes coverage optional.
+
+Composition starts with the base, then adds the primary product, secondary
+products in input order, and applicable overlays in filename order. It retains
+dimension declaration order within each template and includes the source
+template ID with every dimension. Selecting `general` as primary uses the
+base once. Secondary selections must be distinct specialized product IDs.
+
+Each rule has exactly one operator. `product` tests membership in the selected
+primary and secondary product IDs. `tag` tests a known tag. `all` and `any`
+take nonempty lists of rules. Validation checks references in every branch.
+
+| Operator | True | False | Unresolved |
+| --- | --- | --- | --- |
+| `tag` | Present | Absent | Undeclared in partial inspection |
+| `all` | All children true | Any child false | Otherwise |
+| `any` | Any child true | All children false | Otherwise |
+| `not` | Child false | Child true | Child unresolved |
+
+In a confirmed classification, omitted tags are false. In `compose --partial`,
+`--tag` marks a tag present and `--no-tag` marks it absent. A tag declared
+both ways is an error. True overlays and dimensions are listed in `overlays`
+and `dimensions`. Partial inspection also lists `unresolved_overlays` and
+`unresolved_dimensions`. Each unresolved entry contains sorted
+`unresolved_tags` from the branches that still affect its result. An overlay
+entry's `id` identifies its source. Dimension entries use `source`. False
+entries are omitted. Secondary products and partial tag facts are inputs to
+inspection. `init` takes a confirmed primary product and tag set for the
+version 1 workspace profile.
 
 ## State contract
 

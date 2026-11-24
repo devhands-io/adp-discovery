@@ -64,8 +64,12 @@ def read_template(path, expected, forbidden):
         data = yaml.load(path.read_text(encoding="utf-8"), Loader=CatalogLoader)
     except (yaml.YAMLError, DiscoveryError) as error:
         raise DiscoveryError(f"{path}: {error}") from error
-
-    validate_schema("template", data, path)
+    except RecursionError as error:
+        raise DiscoveryError(f"{path}: YAML nesting is too deep") from error
+    try:
+        validate_schema("template", data, path)
+    except RecursionError as error:
+        raise DiscoveryError(f"{path}: template nesting is too deep or contains a recursive YAML alias") from error
     if data["id"] != expected:
         raise DiscoveryError(f"{path}: id must be {expected!r}")
     if forbidden in data:
@@ -73,19 +77,36 @@ def read_template(path, expected, forbidden):
     return data
 
 
-def rule_matches(rule, product, tags):
+def combine_rule_results(results, decisive):
+    """Combine child results using false for an all rule or true for an any rule."""
+    unresolved = set()
+    for value, missing in results:
+        if value is decisive:
+            return decisive, set()
+        unresolved.update(missing)
+    if unresolved:
+        return None, unresolved
+    return not decisive, set()
+
+
+def evaluate_rule(rule, products, tag_values):
+    """Return the truth value and unresolved tags that still affect it."""
     operator, operand = next(iter(rule.items()))
     match operator:
         case "product":
-            return operand == product
+            return operand in products, set()
         case "tag":
-            return operand in tags
+            if operand not in tag_values:
+                return None, {operand}
+            return tag_values[operand], set()
         case "not":
-            return not rule_matches(operand, product, tags)
-        case "all":
-            return all(rule_matches(child, product, tags) for child in operand)
-        case "any":
-            return any(rule_matches(child, product, tags) for child in operand)
+            value, unresolved = evaluate_rule(operand, products, tag_values)
+            return (None if value is None else not value), unresolved
+        case "all" | "any":
+            return combine_rule_results(
+                (evaluate_rule(child, products, tag_values) for child in operand),
+                decisive=operator == "any",
+            )
     raise DiscoveryError(f"unknown rule operator {operator!r}")
 
 
@@ -97,64 +118,120 @@ def check_rule_refs(rule, products, tags, label):
             if operand not in choices:
                 raise DiscoveryError(f"{label}: unknown {operator} {operand!r}")
         case "not":
-            check_rule_refs(operand, products, tags, label)
+            check_rule_refs(operand, products, tags, f"{label}.not")
         case "all" | "any":
-            for child in operand:
-                check_rule_refs(child, products, tags, label)
+            for index, child in enumerate(operand):
+                check_rule_refs(child, products, tags, f"{label}.{operator}[{index}]")
 
 
 class Catalog:
     def __init__(self, directory):
-        self.base = read_template(directory / "base.yaml", "general", "applies")
+        base_path = directory / "base.yaml"
+        self.base = read_template(base_path, "general", "applies")
         self.products = {"general": self.base}
         self.overlays = {}
         self.tags = self.base.get("tags", {})
-        ids = {"general"}
+        paths = {"general": base_path}
         for folder, destination in (("products", self.products), ("overlays", self.overlays)):
             for path in sorted((directory / folder).glob("*.yaml")):
-                if path.stem in ids:
-                    raise DiscoveryError(f"{path}: duplicate template ID {path.stem!r}")
+                if path.stem in paths:
+                    raise DiscoveryError(
+                        f"{path}: duplicate template ID {path.stem!r}; first declared in {paths[path.stem]}"
+                    )
                 item = read_template(path, path.stem, "applies" if folder == "products" else "tags")
                 if folder == "products" and "tags" in item:
                     raise DiscoveryError(f"{path}: declare tags in base.yaml")
-                if folder == "overlays":
-                    if "applies" not in item:
-                        raise DiscoveryError(f"{path}: missing applies rule")
-                    check_rule_refs(item["applies"], self.products, self.tags, path)
+                if folder == "overlays" and "applies" not in item:
+                    raise DiscoveryError(f"{path}: missing applies rule")
                 destination[path.stem] = item
-                ids.add(path.stem)
+                paths[path.stem] = path
 
         owners = {}
         for item in (*self.products.values(), *self.overlays.values()):
-            for dimension in item["dimensions"]:
+            path = paths[item["id"]]
+            if "applies" in item:
+                check_rule_refs(item["applies"], self.products, self.tags, f"{path} $.applies")
+            for index, dimension in enumerate(item["dimensions"]):
+                location = f"{path} $.dimensions[{index}]"
                 key = dimension["id"]
                 if key in owners:
-                    raise DiscoveryError(f"duplicate dimension ID {key!r} in {owners[key]!r} and {item['id']!r}")
-                owners[key] = item["id"]
+                    previous, previous_location = owners[key]
+                    fields = [
+                        field for field in ("question", "required", "applies")
+                        if previous.get(field) != dimension.get(field)
+                    ]
+                    detail = f"; conflicting fields: {', '.join(fields)}" if fields else "; identical declaration"
+                    raise DiscoveryError(
+                        f"duplicate dimension ID {key!r} in {previous_location} and {location}{detail}"
+                    )
+                owners[key] = dimension, location
+                if "applies" in dimension:
+                    check_rule_refs(dimension["applies"], self.products, self.tags, f"{location}.applies")
 
-    def compose(self, product, tags):
-        if product not in self.products:
-            raise DiscoveryError(f"unknown product {product!r}")
-        unknown = sorted(set(tags) - self.tags.keys())
+    def compose(self, product, tags, *, secondary_products=(), partial=False, absent_tags=()):
+        """Compose a confirmed checklist or inspect applicability with partial tag facts."""
+        selected = (product, *secondary_products)
+        products = set()
+        for selection in selected:
+            if selection not in self.products:
+                raise DiscoveryError(f"unknown product {selection!r}")
+            if selection in products:
+                raise DiscoveryError(f"duplicate product selection {selection!r}")
+            products.add(selection)
+        if "general" in selected[1:]:
+            raise DiscoveryError("'general' is the base profile and cannot be selected as a secondary product")
+
+        present = set(tags)
+        absent = set(absent_tags)
+        if absent and not partial:
+            raise DiscoveryError("explicit absent tags require partial inspection (--partial)")
+        unknown = sorted((present | absent) - self.tags.keys())
         if unknown:
             raise DiscoveryError(f"unknown tags: {', '.join(unknown)}")
+        contradictions = sorted(present & absent)
+        if contradictions:
+            raise DiscoveryError(f"tags declared both present and absent: {', '.join(contradictions)}")
+        tag_values = dict.fromkeys(absent if partial else self.tags, False)
+        tag_values.update(dict.fromkeys(present, True))
 
-        tag_set = set(tags)
-        overlays = [
-            item for item in self.overlays.values() if rule_matches(item["applies"], product, tag_set)
-        ]
-        templates = [self.base]
-        if product != "general":
-            templates.append(self.products[product])
-        templates.extend(overlays)
-        dimensions = [
-            {**dimension, "source": item["id"]}
-            for item in templates
-            for dimension in item["dimensions"]
-        ]
-        return {
+        profile = {
             "product": product,
-            "tags": sorted(tag_set),
-            "overlays": [item["id"] for item in overlays],
-            "dimensions": dimensions,
+            "tags": sorted(present),
+            "overlays": [],
+            "dimensions": [],
         }
+        if len(selected) > 1 or partial:
+            profile["secondary_products"] = list(selected[1:])
+        if partial:
+            profile.update(absent_tags=sorted(absent), unresolved_overlays=[], unresolved_dimensions=[])
+
+        templates = [self.base]
+        templates.extend(self.products[key] for key in selected if key != "general")
+        templates.extend(self.overlays.values())
+        for item in templates:
+            source = item["id"]
+            template_result = (True, set())
+            if "applies" in item:
+                template_result = evaluate_rule(item["applies"], products, tag_values)
+                value, missing = template_result
+                if value is False:
+                    continue
+                if value is True:
+                    profile["overlays"].append(source)
+                else:
+                    profile["unresolved_overlays"].append({"id": source, "unresolved_tags": sorted(missing)})
+            for dimension in item["dimensions"]:
+                result = template_result
+                if "applies" in dimension:
+                    result = combine_rule_results(
+                        (template_result, evaluate_rule(dimension["applies"], products, tag_values)),
+                        decisive=False,
+                    )
+                value, missing = result
+                entry = {key: dimension[key] for key in ("id", "question", "required")}
+                entry["source"] = source
+                if value is True:
+                    profile["dimensions"].append(entry)
+                elif value is None:
+                    profile["unresolved_dimensions"].append({**entry, "unresolved_tags": sorted(missing)})
+        return profile

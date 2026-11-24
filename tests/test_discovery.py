@@ -30,10 +30,19 @@ class CatalogTests(unittest.TestCase):
         shutil.copytree(ROOT / "templates", self.path)
 
     def change_overlay(self, transform):
-        path = self.path / "overlays" / "security.yaml"
+        self.change_template("overlays/security.yaml", transform)
+
+    def change_template(self, filename, transform):
+        path = self.path / filename
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         transform(data)
         path.write_text(yaml.safe_dump(data), encoding="utf-8")
+
+    def add_product(self, product, **dimension):
+        path = self.path / "products" / f"{product}.yaml"
+        path.write_text(yaml.safe_dump({
+            "version": 1, "id": product, "dimensions": [dimension],
+        }), encoding="utf-8")
 
     def test_composition_is_ordered_and_repeatable(self):
         first = self.catalog.compose("agent-skill", ["sensitive-data", "external-actions"])
@@ -80,6 +89,145 @@ class CatalogTests(unittest.TestCase):
             self.catalog.compose("building", [])
         with self.assertRaisesRegex(DiscoveryError, "unknown tags"):
             self.catalog.compose("general", ["typo"])
+
+    def test_secondary_products_follow_input_order_and_can_activate_overlays(self):
+        self.add_product("artifact", id="artifact-format", question="Which format?", required=True)
+        self.add_product("process", id="process-owner", question="Who owns the process?", required=False)
+        self.change_template("base.yaml", lambda data: data["dimensions"][0].update(applies={"product": "process"}))
+        catalog = Catalog(self.path)
+
+        profile = catalog.compose("artifact", [], secondary_products=["process", "agent-skill"])
+        self.assertEqual(profile["secondary_products"], ["process", "agent-skill"])
+        self.assertEqual(profile["overlays"], ["evaluation"])
+        self.assertEqual(
+            [dimension["source"] for dimension in profile["dimensions"]],
+            ["general"] * 5 + ["artifact", "process"] + ["agent-skill"] * 4 + ["evaluation"] * 2,
+        )
+        self.assertEqual(profile["dimensions"][0]["id"], "purpose")
+        reversed_profile = catalog.compose("artifact", [], secondary_products=["agent-skill", "process"])
+        self.assertEqual(reversed_profile["dimensions"][5]["id"], "artifact-format")
+        self.assertEqual(reversed_profile["dimensions"][6]["id"], "invocation")
+        self.assertNotIn("purpose", [item["id"] for item in catalog.compose("general", [])["dimensions"]])
+        general = catalog.compose("general", [], secondary_products=["process"])
+        self.assertEqual([dimension["source"] for dimension in general["dimensions"]], ["general"] * 5 + ["process"])
+
+    def test_invalid_secondary_products_and_tag_facts(self):
+        for options, message in (
+            ({"secondary_products": ["agent-skill"]}, "duplicate product selection 'agent-skill'"),
+            ({"secondary_products": ["unknown"]}, "unknown product 'unknown'"),
+            ({"secondary_products": ["general"]}, "cannot be selected as a secondary product"),
+            ({"absent_tags": ["sensitive-data"]}, "require partial inspection"),
+            ({"partial": True, "absent_tags": ["typo"]}, "unknown tags: typo"),
+            ({"partial": True, "absent_tags": ["external-actions"]}, "both present and absent: external-actions"),
+        ):
+            with self.subTest(options=options), self.assertRaisesRegex(DiscoveryError, message):
+                self.catalog.compose("agent-skill", ["external-actions"], **options)
+
+    def test_partial_overlay_applicability_reports_relevant_unknown_tags(self):
+        profile = self.catalog.compose("agent-skill", [], partial=True)
+        self.assertEqual(profile["overlays"], ["evaluation"])
+        self.assertEqual(profile["unresolved_overlays"], [
+            {"id": "security", "unresolved_tags": ["external-actions", "sensitive-data"]},
+        ])
+        self.assertEqual(
+            [(item["id"], item["source"]) for item in profile["unresolved_dimensions"]],
+            [("authority", "security"), ("information-handling", "security")],
+        )
+        self.assertNotIn("security", [item["source"] for item in profile["dimensions"]])
+
+        undecided = self.catalog.compose("agent-skill", [], partial=True, absent_tags=["external-actions"])
+        self.assertEqual(undecided["unresolved_overlays"], [{"id": "security", "unresolved_tags": ["sensitive-data"]}])
+        excluded = self.catalog.compose(
+            "agent-skill", [], partial=True, absent_tags=["external-actions", "sensitive-data"],
+        )
+        self.assertEqual(excluded["overlays"], ["evaluation"])
+        self.assertEqual(excluded["unresolved_overlays"], [])
+        self.assertEqual(excluded["unresolved_dimensions"], [])
+        included = self.catalog.compose("agent-skill", ["external-actions"], partial=True)
+        self.assertEqual(included["overlays"], ["evaluation", "security"])
+        self.assertEqual(included["unresolved_overlays"], [])
+        self.assertEqual(included["unresolved_dimensions"], [])
+
+    def test_dimension_condition_combines_with_overlay_condition(self):
+        self.change_overlay(lambda data: data["dimensions"][0].update(
+            required=False,
+            applies={"all": [{"not": {"tag": "sensitive-data"}}, {"product": "agent-skill"}]},
+        ))
+        catalog = Catalog(self.path)
+        for product, tags, absent, expected, missing in (
+            ("agent-skill", [], [], "unresolved_dimensions", ["external-actions", "sensitive-data"]),
+            ("agent-skill", ["external-actions"], [], "unresolved_dimensions", ["sensitive-data"]),
+            ("agent-skill", ["external-actions"], ["sensitive-data"], "dimensions", []),
+            ("agent-skill", ["sensitive-data"], [], None, []),
+            ("general", [], [], None, []),
+        ):
+            with self.subTest(product=product, tags=tags, absent=absent):
+                profile = catalog.compose(product, tags, partial=True, absent_tags=absent)
+                locations = {
+                    key: [item for item in profile[key] if item["id"] == "authority"]
+                    for key in ("dimensions", "unresolved_dimensions")
+                }
+                self.assertEqual([key for key, items in locations.items() if items], [expected] if expected else [])
+                if expected:
+                    dimension, = locations[expected]
+                    self.assertFalse(dimension["required"])
+                    self.assertEqual(dimension["source"], "security")
+                    self.assertEqual(dimension.get("unresolved_tags", []), missing)
+
+    def test_template_version_and_dimension_rule_validation(self):
+        for edit, message in (
+            (lambda data: data.pop("version"), "version.*required"),
+            (lambda data: data.update(version=2), r"\$\.version: 1 was expected"),
+            (lambda data: data["dimensions"][0].update(id="purpose\n"), r"dimensions\[0\]\.id"),
+            (lambda data: data["dimensions"][0].update(applies={"all": []}), r"dimensions\[0\]\.applies"),
+            (lambda data: data["dimensions"][0].update(applies={"tag": "sensitive-data", "product": "general"}),
+             r"dimensions\[0\]\.applies"),
+            (lambda data: data["dimensions"][0].update(
+                applies={"any": [{"product": "general"}, {"not": {"tag": "unknown"}}]},
+            ), r"dimensions\[0\]\.applies\.any\[1\]\.not: unknown tag 'unknown'"),
+        ):
+            with self.subTest(message=message):
+                shutil.copyfile(ROOT / "templates/base.yaml", self.path / "base.yaml")
+                self.change_template("base.yaml", edit)
+                with self.assertRaisesRegex(DiscoveryError, message):
+                    Catalog(self.path)
+
+    def test_duplicate_dimensions_identify_both_sources_and_conflicting_fields(self):
+        base_dimension = self.catalog.base["dimensions"][0]
+        self.add_product("overlap", **base_dimension)
+        with self.assertRaisesRegex(
+            DiscoveryError, r"duplicate dimension ID 'purpose'.*base\.yaml.*overlap\.yaml.*identical declaration",
+        ):
+            Catalog(self.path)
+        self.add_product("overlap", **{**base_dimension, "question": "Why?", "required": False})
+        with self.assertRaisesRegex(
+            DiscoveryError, r"duplicate dimension ID 'purpose'.*base\.yaml.*overlap\.yaml.*conflicting fields: question, required",
+        ):
+            Catalog(self.path)
+
+    def test_duplicates_within_a_template_and_across_template_roles(self):
+        self.change_overlay(lambda data: data["dimensions"].append(data["dimensions"][0].copy()))
+        with self.assertRaisesRegex(
+            DiscoveryError, r"duplicate dimension ID 'authority'.*dimensions\[0\].*dimensions\[2\]",
+        ):
+            Catalog(self.path)
+        self.add_product("security", id="security-owner", question="Who owns security?", required=True)
+        with self.assertRaisesRegex(
+            DiscoveryError, r"overlays/security\.yaml: duplicate template ID 'security'.*products/security\.yaml",
+        ):
+            Catalog(self.path)
+
+    def test_duplicate_dimensions_are_rejected_even_with_exclusive_overlays(self):
+        def negate_evaluation_condition(data):
+            data["applies"] = {"not": {"tag": "sensitive-data"}}
+            data["dimensions"][0]["id"] = "evaluation-cases"
+
+        self.change_template("overlays/evaluation.yaml", lambda data: data.update(applies={"tag": "sensitive-data"}))
+        self.change_overlay(negate_evaluation_condition)
+        with self.assertRaisesRegex(
+            DiscoveryError, r"duplicate dimension ID 'evaluation-cases'.*evaluation\.yaml.*security\.yaml",
+        ):
+            Catalog(self.path)
 
 
 class StateTests(unittest.TestCase):
@@ -191,6 +339,30 @@ class CliTests(unittest.TestCase):
             self.assertIn("## Open questions", rendered)
             self.assertIn("covered by `purpose-agreed` with owner", rendered)
             self.assertIn("`invocation` has a gap", rendered)
+
+    def test_compose_inspects_partial_configuration(self):
+        profile = json.loads(self.command(
+            "compose", "--product", "general", "--secondary-product", "agent-skill",
+            "--partial", "--no-tag", "sensitive-data",
+        ))
+        self.assertEqual(profile["secondary_products"], ["agent-skill"])
+        self.assertEqual(profile["absent_tags"], ["sensitive-data"])
+        self.assertEqual(profile["overlays"], ["evaluation"])
+        self.assertEqual(profile["unresolved_overlays"], [{"id": "security", "unresolved_tags": ["external-actions"]}])
+        self.assertEqual(profile["unresolved_dimensions"][0]["source"], "security")
+        confirmed = json.loads(self.command("compose", "--product", "agent-skill"))
+        self.assertEqual(set(confirmed), {"product", "tags", "overlays", "dimensions"})
+        self.assertEqual(confirmed["overlays"], ["evaluation"])
+
+    def test_compose_rejects_contradictory_tag_facts(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "src.adp_discovery", "compose", "--product", "general", "--partial",
+             "--tag", "external-actions", "--no-tag", "external-actions"],
+            cwd=ROOT, capture_output=True, encoding="utf-8", timeout=15,
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("both present and absent: external-actions", result.stderr)
 
     def test_checked_in_pilot_export_is_reproducible(self):
         folder = ROOT / "examples" / "self-discovery"

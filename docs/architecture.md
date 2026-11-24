@@ -2,7 +2,8 @@
 
 | Component | Owns |
 | --- | --- |
-| Codex interview skill | Classification proposals, stakeholder confirmation, question selection, evidence interpretation, and contradiction analysis |
+| Interview skill | Classification proposals, stakeholder confirmation, question selection and delivery, evidence interpretation, and contradiction analysis |
+| Agent host | Availability and presentation of built-in question dialogs |
 | Catalog | Product-neutral and domain-specific dimensions, tag definitions, overlay conditions |
 | Python commands | Schema validation, rule evaluation, ordered composition, state integrity, and preliminary evidence coverage |
 | Workspace state | Checklist snapshot, discovery summary, and traceable working records |
@@ -13,6 +14,14 @@ The product type describes what is being discovered. The base template also
 serves as the `general` profile for digital, physical, operational, knowledge,
 agent-native, or legal and governance products that lack a specialized
 template. Applicability tags describe independent facts about the product.
+
+## Interview interaction contract
+
+The skill asks stakeholder questions through the host's built-in dialog when
+the session provides one. Otherwise it explains the fallback and asks in chat.
+An unanswered question stays open. Confirmation and dependent steps require
+an explicit stakeholder reply. Python commands operate on the resulting
+workspace state.
 
 ## Catalog contract
 

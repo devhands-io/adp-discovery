@@ -19,5 +19,7 @@ replay leaves handling, authority, and evaluation ownership unresolved.
 | Questions about serialization, indexes, and deployment are premature at the stakeholder level. | Ask what the next session must recover and verify. |
 
 For a live replay, ask the stakeholder to confirm the pilot classification and
-resolve the open questions. Resume from the named state file in a fresh Codex
-chat to check skill discovery and the interviewer's question selection.
+resolve the open questions. Resume from the named state file in a fresh agent
+session to check skill discovery and question selection. Use the
+[live acceptance checks](../../docs/acceptance.md#stakeholder-question-delivery)
+to verify dialog delivery and chat fallback.

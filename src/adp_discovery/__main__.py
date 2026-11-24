@@ -1,4 +1,4 @@
-"""Command-line tools for the Codex interview skill and local review."""
+"""Command-line tools for the discovery interview skill and local review."""
 
 import argparse
 import json

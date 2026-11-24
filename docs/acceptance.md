@@ -58,6 +58,11 @@ get approval to begin the interview. Approval to maintain the framework
 covers maintenance. During the interview, reuse earlier answers and ask one
 focused question or a small related batch.
 
+For a Claude Code pilot, open the project folder and verify that `/interview`
+appears in the slash menu. Use the README's Claude Code prompts to start and
+resume. Check that the first invocation creates the requested workspace and
+the second loads the saved question batch.
+
 Rate each item as pass, partial, or fail and cite an observation. A pass meets
 the check below, a partial leaves part unverified or unmet, and a fail records
 a direct miss. Baseline coherence, traceability, and applicability must pass

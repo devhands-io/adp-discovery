@@ -107,19 +107,16 @@ in your prompt. [Codex skills documentation](https://learn.chatgpt.com/docs/buil
 
 #### Claude Code
 
-Claude Code looks for project skills in `.claude/skills/`. Use the skill
-directly from its existing project path by asking Claude Code to read it.
+Type `/interview` in Claude Code to start the project skill.
 [Claude Code skills documentation](https://code.claude.com/docs/en/skills#skills-locations)
 
-> Read and follow `.agents/skills/interview/SKILL.md`. Help me discover a
-> skill that turns meeting notes into a decision register. Save progress under
-> `.discovery/meeting-decisions/`.
+> /interview Help me discover a skill that turns meeting notes into a decision
+> register. Save progress under `.discovery/meeting-decisions/`.
 
 #### OpenCode
 
 OpenCode discovers project skills in `.agents/skills/`. Mention `@interview`
-in your prompt. If your version does not recognize that mention, use the
-file-based prompt above. [OpenCode skills documentation](https://opencode.ai/docs/skills/)
+in your prompt. [OpenCode skills documentation](https://opencode.ai/docs/skills/)
 
 > @interview Help me discover a skill that turns meeting notes into a decision
 > register. Save progress under `.discovery/meeting-decisions/`.
@@ -137,11 +134,22 @@ without one, the agent asks in chat.
 
 ### 3. Resume and export
 
-Start a fresh chat in the same folder and paste this prompt.
+Start a fresh chat in the same folder and use the same skill invocation.
 
-> Read and follow `.agents/skills/interview/SKILL.md`. Resume
-> `.discovery/meeting-decisions/state.json` and continue with the saved question
-> batch. If the batch is empty, review the remaining gaps.
+**Codex**
+
+> $interview Resume `.discovery/meeting-decisions/state.json` and continue with
+> the saved questions. If none are queued, review the remaining gaps.
+
+**Claude Code**
+
+> /interview Resume `.discovery/meeting-decisions/state.json` and continue with
+> the saved questions. If none are queued, review the remaining gaps.
+
+**OpenCode**
+
+> @interview Resume `.discovery/meeting-decisions/state.json` and continue with
+> the saved questions. If none are queued, review the remaining gaps.
 
 Then ask for a baseline, even if the interview is still in progress.
 
@@ -151,6 +159,16 @@ Then ask for a baseline, even if the interview is still in progress.
 Open `.discovery/meeting-decisions/baseline.md` and check whether the brief
 reflects your idea, the decisions match what you confirmed, and open questions
 and blockers are easy to find.
+
+#### If your agent doesn't recognize the skill
+
+Check that the agent has the project folder open, then paste this prompt.
+
+> Read and follow `.agents/skills/interview/SKILL.md`. Help me discover a
+> skill that turns meeting notes into a decision register. Save progress under
+> `.discovery/meeting-decisions/`.
+
+To resume, use the same first sentence followed by the resume request above.
 
 ### 4. Share feedback
 

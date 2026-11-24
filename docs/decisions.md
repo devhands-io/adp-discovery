@@ -5,6 +5,7 @@
 | Release the first vertical slice as the foundation, catalog, interview, and pilot | The supplied brief defines an end-to-end interview as the first success criterion. Supporting skills, a larger catalog, and additional artifacts are subsequent milestones. |
 | Use local Python, YAML templates, and JSON Schema | YAML is readable for catalog authors. Python and JSON Schema provide deterministic checks with two direct dependencies. The command runs from a repository checkout. |
 | Keep classification, decision confirmation, and stakeholder reconciliation in the interview | Supporting skills can record conflicts and reopen affected decisions. Stakeholders confirm meaning, and the core checks consistency and calculates evidence coverage. |
+| Ship a Claude Code entry point for `/interview` | A regular project skill file works with Git checkouts and ZIP downloads. It forwards the request to the shared interview instructions so there is one workflow to maintain. |
 | Require built-in question dialogs when available | The skill uses the host's input capability and falls back to chat when the session lacks one. Both paths require an explicit reply before the interview acts on an answer. |
 | Store revisioned JSON with a fixed checklist snapshot | A resuming session reads the same scope after a catalog edit. A changed classification starts a new workspace in version 1. |
 | Use a single Markdown export with traceable sections | One artifact is sufficient to review the first slice and can be reproduced directly from state. |

@@ -18,6 +18,10 @@ template. Applicability tags describe independent facts about the product.
 
 ## Interview interaction contract
 
+The interview workflow and its references live in `.agents/skills/interview/`.
+Claude Code discovers `/interview` through `.claude/skills/interview/SKILL.md`,
+which passes the user's request to the shared workflow.
+
 The skill asks stakeholder questions through the host's built-in dialog when
 the session provides one. If the session has no dialog, the skill explains the
 fallback and asks in chat. Each prompt appears once per round. An unanswered

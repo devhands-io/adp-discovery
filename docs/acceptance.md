@@ -79,3 +79,22 @@ for pilot acceptance.
 Save the traceable state and generate the baseline from it. Keep the scored
 review separate from product findings and obtain approval before implementing
 any proposed framework fixes.
+
+## Supporting skills
+
+Run each invocation in a fresh Codex chat in the project and name the exact
+state path. Use disposable workspaces and check the artifacts against the saved
+revision with `show` and `report --format json`.
+
+| Invocation | Acceptance condition |
+| --- | --- |
+| `$investigate` against the meeting-register workspace after the sensitivity decision, with the records policy from the next round supplied as a source | Saves the policy evidence and an open contradiction, reopens `infer-owners` while preserving its text and evidence, and leaves `handling-review` in the saved batch. `investigation.md` gives the source locator, confidence and rationale, and the unresolved policy question. |
+| `$define-requirements` against the meeting-register workspace before the conflict, then again after investigation | Produces IDs, evidence and decision links, and an observable check for the confirmed owner rule. Flags that rule as disputed on rerun and preserves the IDs of unchanged obligations. Preferences and proposals remain review inputs. Missing decisions stay visible. |
+| `$model-product` against a `general` residential building workspace with a confirmed relationship between the entry and shared space | Produces a space adjacency model with ledger links and marks unconfirmed relationships. In a separate run where a model would add no value, explains the reason and leaves the workspace without a new model. |
+
+Run investigation in a draft workspace with a source that answers one question
+and leaves another open. Verify evidence and gaps are saved before
+classification. Use a copy of the legacy pilot to check that the supporting
+skills can read v1 without upgrading it automatically.
+For the requirements rerun, include a second confirmed obligation outside the
+conflict, such as producing a local draft without taking external actions.

@@ -2,7 +2,8 @@
 
 | Component | Owns |
 | --- | --- |
-| Interview skill | Classification proposals, stakeholder confirmation, question selection and delivery, evidence interpretation, and contradiction analysis |
+| Interview skill | Classification proposals, stakeholder confirmation, question selection and delivery, evidence interpretation in interviews, and stakeholder reconciliation |
+| Supporting skills | Evidence investigation, requirements derivation, and optional conceptual modeling |
 | Agent host | Availability and presentation of built-in question dialogs |
 | Catalog | Product-neutral and domain-specific dimensions, tag definitions, and applicability rules |
 | Python commands | Schema validation, rule evaluation, ordered composition, state integrity, and preliminary evidence coverage |
@@ -125,3 +126,17 @@ The Markdown export is a point-in-time review of one state revision. JSON
 report output gives machine-readable preliminary readiness findings.
 The v2 Markdown report explains the computed status and identifies stakeholder
 approval as a separate step.
+
+## Supporting skills
+
+Investigation, requirements, and conceptual modeling are independently
+invocable. Each reads the same workspace and uses the ledger for material
+evidence, gaps, and contradictions. Supporting skills preserve the interview
+frontier. An open contradiction against a confirmed decision reopens that
+decision in the same save. The stakeholder settles what governs.
+
+Skill outputs are separate Markdown artifacts tied to the workspace revision
+and ledger IDs. Investigation records confidence and its basis. Requirements
+retain stable IDs for unchanged obligations and cite their discovery sources.
+Modeling uses a representation suited to the product and can be skipped.
+See the [workspace and artifact contract](supporting-skills.md).

@@ -5,7 +5,7 @@ development environment where people and agents plan, execute, verify, and
 release work together.
 
 **ADP Discovery** is a local product discovery framework for agent hosts that
-can load its interview skill. Turn an early idea into a reviewable discovery
+can load its skills. Turn an early idea into a reviewable discovery
 brief with confirmed decisions, open questions, and a preliminary readiness
 assessment.
 
@@ -14,10 +14,22 @@ assessment.
 | Skill | When to use it | What it produces |
 | --- | --- | --- |
 | [`interview`](.agents/skills/interview/SKILL.md) | Start discovery, resume a saved interview, or reconcile conflicting stakeholder answers. | A saved discovery workspace with classification, evidence, decisions, and the next question batch. On request, a Markdown baseline for review. |
+| [`investigate`](.agents/skills/investigate/SKILL.md) | Verify a claim, assess feasibility, or compare alternatives. | Sourced evidence and gaps in the workspace, plus `investigation.md`. |
+| [`define-requirements`](.agents/skills/define-requirements/SKILL.md) | Translate confirmed findings into verifiable requirements. | `requirements.md` with stable IDs, source links, and acceptance criteria or gaps. |
+| [`model-product`](.agents/skills/model-product/SKILL.md) | Clarify a structure, relationship, workflow, or responsibility. | An optional `model.md` grounded in discovery evidence and decisions. |
 
-The current release includes `interview`. Later milestones cover
-`investigate` for gathering evidence, `define-requirements` for drafting
-requirements, and `model-product` for modeling the product.
+Invoke any supporting skill directly in Codex and name the workspace. For example:
+
+> $investigate Check which records policy applies to missing owners in
+> `.discovery/meeting-decisions/state.json`.
+
+> $define-requirements Derive requirements from
+> `.discovery/meeting-decisions/state.json` and flag missing decisions.
+
+> $model-product Check whether a space adjacency model would help with
+> `.discovery/community-center/state.json`.
+
+The skills share the [workspace and artifact conventions](docs/supporting-skills.md).
 
 ## Try the interview skill
 

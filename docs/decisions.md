@@ -4,7 +4,7 @@
 | --- | --- |
 | Release the first vertical slice as the foundation, catalog, interview, and pilot | The supplied brief defines an end-to-end interview as the first success criterion. Supporting skills, a larger catalog, and additional artifacts are subsequent milestones. |
 | Use local Python, YAML templates, and JSON Schema | YAML is readable for catalog authors. Python and JSON Schema provide deterministic checks with two direct dependencies. The command runs from a repository checkout. |
-| Keep classification and contradiction judgment in the interview | Stakeholders confirm meaning. The core checks the consistency of the recorded results and calculates evidence coverage. |
+| Keep classification, decision confirmation, and stakeholder reconciliation in the interview | Supporting skills can record conflicts and reopen affected decisions. Stakeholders confirm meaning, and the core checks consistency and calculates evidence coverage. |
 | Require built-in question dialogs when available | The skill uses the host's input capability and falls back to chat when the session lacks one. Both paths require an explicit reply before the interview acts on an answer. |
 | Store revisioned JSON with a fixed checklist snapshot | A resuming session reads the same scope after a catalog edit. A changed classification starts a new workspace in version 1. |
 | Use a single Markdown export with traceable sections | One artifact is sufficient to review the first slice and can be reproduced directly from state. |
@@ -17,13 +17,12 @@
 | Derive readiness from applicability and evidence | Required unknown applicability stays visible as a gap. Confirmed exclusions and optional gaps can be reported without imposing coverage or implying stakeholder approval. |
 | Explain readiness in v2 Markdown | A short explanation helps stakeholders interpret the status at a glance. The status values and JSON output remain compatible. |
 | Keep pilot evaluation outside the interview | Maintainers agree on the rubric and get approval for the live session before opening a dialog. Stakeholders answer only the product questions. |
+| Run supporting skills independently against the same ledger | A project can investigate, derive requirements, or model where it needs help. Revision-linked Markdown holds the derived details and permits review with the existing state schemas. |
 
 ## Subsequent slices
 
-1. Add independent investigation, requirements, and modeling skills against the
-   same state and artifact conventions.
-2. Establish the full artifact set and deeper evidence and readiness checks.
-3. Add specialized building, process, and contract templates with distinct
+1. Establish the full artifact set and deeper evidence and readiness checks.
+2. Add specialized building, process, and contract templates with distinct
    discovery pilots.
-4. Expand the catalog in reviewed batches and introduce migrations when the
+3. Expand the catalog in reviewed batches and introduce migrations when the
    contracts change.

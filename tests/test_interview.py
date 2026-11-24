@@ -128,6 +128,31 @@ class InterviewTests(unittest.TestCase):
         self.assertEqual(findings["information-handling"], "inapplicable")
         self.assertEqual(self.state["profiles"][0], prior["profiles"][0])
 
+    def test_investigation_can_surface_conflict_without_changing_interview_batch(self):
+        for index in range(3):
+            self.play(index)
+        previous = copy.deepcopy(self.state)
+        candidate = self.candidate(3)
+        # The interview can create and schedule its reconciliation prompt later.
+        candidate["records"] = [item for item in candidate["records"]
+                                if item["id"] != "reconcile-owner-rule"]
+        candidate["frontier"] = previous["frontier"]
+        self.command("save", self.path, candidate=candidate)
+
+        saved = self.command("show", self.path)
+        prior_records = {item["id"]: item for item in previous["records"]}
+        records = {item["id"]: item for item in saved["records"]}
+        self.assertEqual(saved["profiles"], previous["profiles"])
+        self.assertEqual(saved["frontier"], ["handling-review"])
+        self.assertEqual(records["infer-owners"], {**prior_records["infer-owners"], "status": "reopened"})
+        self.assertEqual(records["owner-confirms-handling"], prior_records["owner-confirms-handling"])
+        self.assertTrue(records["owner-policy"]["source"])
+        self.assertEqual(set(records["owner-rule-conflict"]["refs"]),
+                         {"infer-owners", "owner-confirms-handling", "owner-policy"})
+        report = self.command("report", self.path, "--format", "json")
+        self.assertIn("owner-rule-conflict", report["blockers"])
+        self.assertIn("infer-owners", report["blockers"])
+
     def test_dependency_and_profile_integrity(self):
         self.play(0)
         candidate = self.candidate(1)

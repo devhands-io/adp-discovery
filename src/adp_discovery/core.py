@@ -168,8 +168,9 @@ class Catalog:
                 if "applies" in dimension:
                     check_rule_refs(dimension["applies"], self.products, self.tags, f"{location}.applies")
 
-    def compose(self, product, tags, *, secondary_products=(), partial=False, absent_tags=()):
+    def compose(self, product, tags, *, secondary_products=(), partial=False, absent_tags=(), snapshot=False):
         """Compose a confirmed checklist or inspect applicability with partial tag facts."""
+        partial = partial or snapshot
         selected = (product, *secondary_products)
         products = set()
         for selection in selected:
@@ -208,18 +209,27 @@ class Catalog:
         templates = [self.base]
         templates.extend(self.products[key] for key in selected if key != "general")
         templates.extend(self.overlays.values())
+        if snapshot:
+            profile.update(
+                secondary_products=list(selected[1:]), absent_tags=sorted(absent),
+                unresolved_overlays=[], unresolved_dimensions=[],
+                inapplicable_overlays=[], inapplicable_dimensions=[],
+                template_versions={item["id"]: item["version"] for item in templates},
+            )
         for item in templates:
             source = item["id"]
             template_result = (True, set())
             if "applies" in item:
                 template_result = evaluate_rule(item["applies"], products, tag_values)
                 value, missing = template_result
-                if value is False:
+                if value is False and not snapshot:
                     continue
                 if value is True:
                     profile["overlays"].append(source)
-                else:
+                elif value is None:
                     profile["unresolved_overlays"].append({"id": source, "unresolved_tags": sorted(missing)})
+                else:
+                    profile["inapplicable_overlays"].append(source)
             for dimension in item["dimensions"]:
                 result = template_result
                 if "applies" in dimension:
@@ -234,4 +244,6 @@ class Catalog:
                     profile["dimensions"].append(entry)
                 elif value is None:
                     profile["unresolved_dimensions"].append({**entry, "unresolved_tags": sorted(missing)})
+                elif snapshot:
+                    profile["inapplicable_dimensions"].append(entry)
         return profile

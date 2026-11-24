@@ -13,7 +13,7 @@ assessment.
 
 | Skill | When to use it | What it produces |
 | --- | --- | --- |
-| [`interview`](.agents/skills/interview/SKILL.md) | Start discovery, resume a saved interview, or reconcile conflicting stakeholder answers. | A saved checklist and working record of evidence, decisions, assumptions, risks, contradictions, and open questions. On request, a Markdown baseline for review. |
+| [`interview`](.agents/skills/interview/SKILL.md) | Start discovery, resume a saved interview, or reconcile conflicting stakeholder answers. | A saved discovery workspace with classification, evidence, decisions, and the next question batch. On request, a Markdown baseline for review. |
 
 The current release includes `interview`. Later milestones cover
 `investigate` for gathering evidence, `define-requirements` for drafting
@@ -114,10 +114,10 @@ file-based prompt above. [OpenCode skills documentation](https://opencode.ai/doc
 
 #### During the interview
 
-Confirm or correct the proposed product type and tags, then answer two or three
-follow-up questions. For the sample, you could say that the register is for the
-project team and should capture each decision and its owner. Say when you’re
-unsure about something. The skill saves progress in
+The skill saves a draft before classification. Confirm or correct the proposed
+product type and share what you know about the tags. For the sample, you could
+say that the register is for the project team and should capture each decision
+and its owner. Say when you’re unsure about something. The skill saves progress in
 `.discovery/meeting-decisions/state.json` as you go.
 
 Answer in the host's built-in question dialog when it is available. In sessions
@@ -128,8 +128,8 @@ without one, the agent asks in chat.
 Start a fresh chat in the same folder and paste this prompt.
 
 > Read and follow `.agents/skills/interview/SKILL.md`. Resume
-> `.discovery/meeting-decisions/state.json` and continue from the highest-impact
-> unresolved question.
+> `.discovery/meeting-decisions/state.json` and continue with the saved question
+> batch. If the batch is empty, review the remaining gaps.
 
 Then ask for a baseline, even if the interview is still in progress.
 
@@ -159,6 +159,13 @@ details removed.
 Run these commands from the project folder. On Windows PowerShell, use
 `.\.venv\Scripts\python.exe` in place of `.venv/bin/python`.
 
+To start a new draft from the CLI, run `init` once. If you already started the
+sample interview above, use its saved state with `show` and `report`.
+
+```sh
+.venv/bin/python -m src.adp_discovery init .discovery/meeting-decisions/state.json --project meeting-decisions --title "Meeting decisions"
+```
+
 ```sh
 .venv/bin/python -m src.adp_discovery catalog
 .venv/bin/python -m src.adp_discovery compose --product agent-skill --partial --no-tag sensitive-data
@@ -168,16 +175,18 @@ Run these commands from the project folder. On Windows PowerShell, use
 ```
 
 The example composition applies Evaluation and shows Security as unresolved
-pending the `external-actions` tag. With `--partial`, use `--tag` for known
-present tags and `--no-tag` for known absent tags. Omitted tags remain
-unresolved. Without `--partial`, omitted tags are treated as absent in the
-confirmed classification. For catalogs with multiple product templates, repeat
-`--secondary-product` in the order you want those templates composed.
+pending the `external-actions` tag. Both `compose --partial` and the v2
+`profile` command use `--tag` for known present tags and `--no-tag` for known
+absent tags. Omitted tags remain unknown. Plain `compose` treats omitted tags
+as absent. For catalogs with multiple product templates, repeat
+`--secondary-product` in composition order.
 
 Working state and exports placed in `.discovery/` are local and Git-ignored.
-The JSON report contains the readiness findings and blocking record IDs.
+The v2 JSON report contains readiness findings, blocking record IDs, and both
+the current question batch and eligible question IDs. Existing v1 workspace
+files can still be read. Use `upgrade PATH --project ID` to adopt v2 in place.
 
-## Included pilot
+## Included pilots
 
 The [self-discovery pilot](examples/self-discovery/pilot.md) uses the supplied
 project brief to discover the framework's first interview skill. Replay its
@@ -188,7 +197,10 @@ project brief to discover the framework's first interview skill. Replay its
 ```
 
 You can also open the [generated pilot baseline](examples/self-discovery/baseline.md).
+The [meeting decision register pilot](examples/meeting-notes/pilot.md) replays
+a v2 interview from draft through conflict resolution.
 For more detail, see the [interview workflow reference](.agents/skills/interview/references/workflow.md),
+[state and CLI reference](.agents/skills/interview/references/state.md),
 [architecture](docs/architecture.md), and [decision log](docs/decisions.md).
 Run the Python tests with `python -m unittest discover -s tests -v`. Use the
 [live acceptance scenarios](docs/acceptance.md#stakeholder-question-delivery)

@@ -68,24 +68,44 @@ and `dimensions`. Partial inspection also lists `unresolved_overlays` and
 `unresolved_tags` from the branches that still affect its result. An overlay
 entry's `id` identifies its source. Dimension entries use `source`. False
 entries are omitted. Secondary products and partial tag facts are inputs to
-inspection. `init` takes a confirmed primary product and tag set for the
-version 1 workspace profile.
+inspection. `profile` uses the same three-valued evaluation and also emits
+false results and the versions of the selected and inspected templates for
+a v2 snapshot. Templates for unselected product types are outside that
+snapshot. `init --product` retains the v1 behavior.
 
 ## State contract
 
-Version 1 is a JSON document governed by the state schema. The saved profile
-contains the exact dimensions, their sources, and applied overlays. New
-catalog revisions affect new interviews. If a classification changes in this
-version, initialize a new workspace with the corrected profile, retain the
-previous workspace, and carry forward compatible evidence and decisions.
+Version 2 starts with `init --project`. The stable project ID, title, intent
+summary, evidence, and question batch can be saved before confirmation. An
+empty profile history represents a draft. After stakeholder confirmation,
+append a catalog snapshot with its confirmation evidence IDs. The latest
+snapshot supplies the active profile. Each snapshot pins primary and secondary
+products, known tag facts, template versions, dimension text and provenance,
+and applicable, unresolved, and inapplicable results. A change in known facts
+or confirmed classification appends a snapshot. Older snapshots retain the
+dimension IDs needed to interpret earlier records. Reading an existing
+workspace does not consult the live catalog.
 
-The working ledger stores evidence, decisions, assumptions, risks, questions,
-and contradictions with stable IDs, checklist links, and record references.
+The ledger stores evidence, preferences, decisions, assumptions, risks,
+questions, and contradictions with stable IDs and links. V2 questions can
+depend on other questions. Prerequisites must resolve before the dependent
+question becomes eligible. Cycles are rejected. The frontier stores up to
+three eligible question IDs in asking order. Deferred questions remain open
+and stay out of the frontier. The interview skill selects the batch, while
+Python checks eligibility.
+
 Save validates the full candidate, retains record identities, preserves
-recorded evidence and established decision wording, and increments the revision
-after checking for stale edits. Writers use a per-file lock directory and
-atomic replacement. Following a terminated writer, remove the adjacent
-`.state.json.lock` directory only after verifying that no writer is active.
+recorded evidence and established decision wording, and increments the
+revision after checking for stale edits. Evidence can gain dimension links
+in v2. Writers use a per-file lock directory and atomic replacement. Following
+a terminated writer, remove the adjacent `.state.json.lock` directory only
+after verifying that no writer is active.
+
+V1 files remain readable and writable with their original contract. Their
+profile is immutable. The explicit `upgrade PATH --project ID` command
+preserves the checklist and ledger, increments the revision, and records
+unknown template versions as `null`. It has no source for past classification
+confirmation IDs or excluded dimensions, so those entries remain empty.
 
 ## Readiness contract
 
@@ -93,8 +113,12 @@ A required dimension is covered by a confirmed decision that links to at
 least one evidence record for that dimension. Every uncovered required
 dimension names its missing support. An open contradiction, reopened
 decision, or open blocking question or risk prevents baseline readiness.
-Optional dimensions and nonblocking gaps remain available for review.
-Stakeholders evaluate the substance and sufficiency of the evidence.
+V2 reports optional dimensions, exclusions, and unknown applicability
+explicitly. Draft classification and unknown applicability for a potentially
+required dimension prevent preliminary readiness. Optional dimensions,
+confirmed exclusions, and nonblocking gaps remain available for review.
+Stakeholders evaluate the substance and sufficiency of the evidence and
+approve the baseline independently of the question frontier.
 
 The Markdown export is a point-in-time review of one state revision. JSON
 report output gives machine-readable preliminary readiness findings.

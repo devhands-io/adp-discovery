@@ -12,6 +12,9 @@
 | Require version 1 on every template | Catalog formats can evolve independently of saved workspace state. Custom unversioned templates need a version field. |
 | Compose in a fixed order and give each dimension one owner | Base, primary product, ordered secondary products, and filename-ordered overlays give a reproducible checklist with a source for each dimension. Rejecting duplicate IDs prevents implicit overrides. |
 | Preserve unresolved applicability in inspection | Partial tag facts can leave overlays or dimensions unresolved and surface which facts are missing. A confirmed single-product tag set still produces the existing version 1 checklist for workspace initialization. |
+| Persist draft interviews and append confirmed profiles in v2 | Save the intent and first question before confirmation. Later changes keep their earlier checklist and evidence links. Explicit upgrades preserve legacy workspaces and record unknown provenance. |
+| Store question dependencies and an ordered batch of IDs | The interview skill ranks meaningful questions. Python validates the dependency graph and eligibility, and a new thread can recover the batch without duplicating question text. |
+| Derive readiness from applicability and evidence | Required unknown applicability stays visible as a gap. Confirmed exclusions and optional gaps can be reported without imposing coverage or implying stakeholder approval. |
 
 ## Subsequent slices
 

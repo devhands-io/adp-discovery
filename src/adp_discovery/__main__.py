@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .core import ROOT, Catalog, read_json
 from .report import markdown, readiness
-from .state import initialize, load_state, save
+from .state import initialize, initialize_draft, load_state, save, upgrade
 
 
 def parser():
@@ -16,29 +16,39 @@ def parser():
     commands = cli.add_subparsers(dest="command", required=True)
     commands.add_parser("validate", help="validate the catalog")
     commands.add_parser("catalog", help="list supported products and tags")
-    for name in ("compose", "init"):
+    for name in ("compose", "profile", "init"):
         command = commands.add_parser(name, help={
             "compose": "inspect a composed discovery checklist",
+            "profile": "compose a version 2 profile snapshot with explicit applicability",
             "init": "create discovery state and save the checklist",
         }[name])
-        command.add_argument("--product", required=True)
         command.add_argument("--tag", action="append", default=[])
         if name == "init":
+            mode = command.add_mutually_exclusive_group(required=True)
+            mode.add_argument("--product", help="create a confirmed version 1 workspace")
+            mode.add_argument("--project", help="create a draft version 2 workspace with this stable ID")
             command.add_argument("state", type=Path)
             command.add_argument("--title", required=True)
         else:
+            command.add_argument("--product", required=True)
             command.add_argument("--secondary-product", action="append", default=[], help="add a product template")
-            command.add_argument("--partial", action="store_true", help="leave undeclared tags unresolved")
-            command.add_argument("--no-tag", action="append", default=[], help="declare a tag absent in partial inspection")
+            command.add_argument("--no-tag", action="append", default=[], help="declare a tag absent in partial composition")
+            if name == "compose":
+                command.add_argument("--partial", action="store_true", help="leave undeclared tags unresolved")
+            else:
+                command.add_argument("--confirmed-by", action="append", default=[], metavar="EVIDENCE_ID")
     for name, help_text in (
         ("show", "load and validate saved state"),
         ("save", "save a complete state document from standard input"),
+        ("upgrade", "explicitly upgrade a version 1 workspace in place"),
         ("report", "render the discovery baseline and preliminary readiness"),
     ):
         command = commands.add_parser(name, help=help_text)
         command.add_argument("state", type=Path)
         if name == "report":
             command.add_argument("--format", choices=("markdown", "json"), default="markdown")
+        elif name == "upgrade":
+            command.add_argument("--project", required=True)
     return cli
 
 
@@ -47,9 +57,16 @@ def run(options):
         return load_state(options.state)
     if options.command == "save":
         return save(options.state, read_json(sys.stdin))
+    if options.command == "upgrade":
+        return upgrade(options.state, options.project)
     if options.command == "report":
         state = load_state(options.state)
         return markdown(state) if options.format == "markdown" else readiness(state)
+
+    if options.command == "init" and options.project is not None:
+        if options.tag:
+            raise ValueError("record classification tags in a confirmed profile after draft initialization")
+        return initialize_draft(options.state, options.title, options.project)
 
     catalog = Catalog(options.templates)
     if options.command == "validate":
@@ -59,6 +76,11 @@ def run(options):
     if options.command == "init":
         profile = catalog.compose(options.product, options.tag)
         return initialize(options.state, options.title, profile)
+    if options.command == "profile":
+        return {**catalog.compose(
+            options.product, options.tag, secondary_products=options.secondary_product,
+            absent_tags=options.no_tag, snapshot=True,
+        ), "confirmed_by": options.confirmed_by}
     return catalog.compose(
         options.product, options.tag,
         secondary_products=options.secondary_product, partial=options.partial, absent_tags=options.no_tag,

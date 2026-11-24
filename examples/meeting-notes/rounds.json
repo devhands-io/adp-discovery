@@ -1,0 +1,61 @@
+{
+  "project": "meeting-notes",
+  "title": "Meeting decision register",
+  "summary": "Help the project team capture decisions and their owners from meeting notes.",
+  "rounds": [
+    {
+      "name": "Draft from the brief",
+      "frontier": ["confirm-type"],
+      "records": [
+        {"id":"initial-brief","kind":"evidence","status":"recorded","source":"Stakeholder brief","text":"The project team needs a draft decision register with the decision and its owner.","dimensions":[],"refs":[]},
+        {"id":"confirm-type","kind":"question","status":"open","text":"Is this an on-demand agent skill used by the project team?","dimensions":[],"refs":["initial-brief"],"blocking":true,"depends_on":[]}
+      ]
+    },
+    {
+      "name": "Confirm the type and capture tentative views",
+      "profile_args": ["--product","agent-skill","--no-tag","external-actions","--confirmed-by","type-confirmation"],
+      "frontier": ["source-sensitivity"],
+      "records": [
+        {"id":"initial-brief","dimensions":["purpose","outputs"]},
+        {"id":"type-confirmation","kind":"evidence","status":"recorded","source":"Stakeholder, round 2","text":"Yes, it is an on-demand agent skill. It only drafts locally. I need to check whether the source notes contain private information. I prefer Markdown for review.","dimensions":["invocation","outputs"],"refs":[]},
+        {"id":"confirm-type","status":"resolved","refs":["initial-brief","type-confirmation"],"resolution":"Stakeholder confirmed the on-demand agent skill."},
+        {"id":"markdown-preference","kind":"preference","status":"recorded","text":"The stakeholder favors Markdown for team review.","dimensions":["outputs"],"refs":["type-confirmation"]},
+        {"id":"named-owners","kind":"assumption","status":"open","text":"Meeting notes usually name a decision owner.","dimensions":["outputs"],"refs":["initial-brief"]},
+        {"id":"recommend-owner-field","kind":"decision","status":"proposed","text":"Always include an explicit owner field, even when the source omits it.","dimensions":["outputs"],"refs":["initial-brief"]},
+        {"id":"source-sensitivity","kind":"question","status":"open","text":"What kinds of information do the meeting notes contain?","dimensions":[],"refs":["type-confirmation"],"blocking":true,"depends_on":["confirm-type"]},
+        {"id":"handling-review","kind":"question","status":"open","text":"Who can review the draft and its source notes?","dimensions":["information-handling"],"refs":[],"blocking":true,"depends_on":["source-sensitivity"]}
+      ]
+    },
+    {
+      "name": "Confirm sensitivity and an output decision",
+      "profile_args": ["--product","agent-skill","--tag","sensitive-data","--no-tag","external-actions","--confirmed-by","owner-confirms-handling"],
+      "frontier": ["handling-review"],
+      "records": [
+        {"id":"owner-confirms-handling","kind":"evidence","status":"recorded","source":"Stakeholder, round 3","text":"The notes can include named personnel matters. Missing owners may be inferred and shown if labeled tentative.","dimensions":["information-handling","outputs"],"refs":[]},
+        {"id":"source-sensitivity","status":"resolved","refs":["type-confirmation","owner-confirms-handling"],"resolution":"Stakeholder confirmed the notes can contain sensitive personnel information."},
+        {"id":"infer-owners","kind":"decision","status":"confirmed","text":"Show inferred owners with a tentative label when the meeting notes omit the owner.","dimensions":["outputs"],"refs":["owner-confirms-handling"]}
+      ]
+    },
+    {
+      "name": "Surface conflicting evidence",
+      "frontier": ["reconcile-owner-rule"],
+      "records": [
+        {"id":"owner-policy","kind":"evidence","status":"recorded","source":"Stakeholder-provided records policy, round 4","text":"Names must not appear in the decision register unless the source explicitly names the decision owner.","dimensions":["outputs","information-handling"],"refs":[]},
+        {"id":"infer-owners","status":"reopened"},
+        {"id":"owner-rule-conflict","kind":"contradiction","status":"open","text":"The output rule allows tentative names while the records policy requires an explicit source.","dimensions":["outputs"],"refs":["owner-confirms-handling","owner-policy","infer-owners"]},
+        {"id":"reconcile-owner-rule","kind":"question","status":"open","text":"Which rule governs when the source omits the owner?","dimensions":["outputs"],"refs":["owner-rule-conflict"],"blocking":true,"depends_on":[]}
+      ]
+    },
+    {
+      "name": "Resolve and preserve the original decision",
+      "frontier": ["handling-review"],
+      "records": [
+        {"id":"owner-resolves-conflict","kind":"evidence","status":"recorded","source":"Stakeholder, round 5","text":"Follow the records policy. Use 'unassigned' when the source omits the owner.","dimensions":["outputs"],"refs":[]},
+        {"id":"explicit-owners-only","kind":"decision","status":"confirmed","text":"Use 'unassigned' when the source omits the owner.","dimensions":["outputs"],"refs":["owner-resolves-conflict"]},
+        {"id":"infer-owners","status":"superseded","refs":["owner-confirms-handling","owner-resolves-conflict","explicit-owners-only"],"resolution":"Replaced by explicit-owners-only after stakeholder confirmation."},
+        {"id":"owner-rule-conflict","status":"resolved","refs":["owner-confirms-handling","owner-policy","infer-owners","owner-resolves-conflict"],"resolution":"The stakeholder confirmed that the records policy governs."},
+        {"id":"reconcile-owner-rule","status":"resolved","refs":["owner-rule-conflict","owner-resolves-conflict"],"resolution":"Use 'unassigned' when the source omits the owner."}
+      ]
+    }
+  ]
+}

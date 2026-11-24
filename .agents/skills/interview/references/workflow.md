@@ -1,64 +1,67 @@
-# Interview workflow reference
+# Interview workflow
 
-Run commands from the repository root with its Python environment active. The
-[README](../../../../README.md) covers setup and
-[architecture](../../../../docs/architecture.md) defines the state contract.
+## Establish intent and classification
 
-## Start or resume
+Capture the intended outcome and audience from the brief. Save the brief as
+sourced evidence and the proposed classification as an open question in the
+draft workspace. Ask the stakeholder to confirm or correct the primary type,
+specialized secondary types, and the tag facts they can establish. Use the
+catalog's descriptions and partial composition to ask for facts that could
+change discovery scope.
 
-```sh
-python -m src.adp_discovery catalog
-python -m src.adp_discovery compose --product agent-skill --tag sensitive-data
-python -m src.adp_discovery init .discovery/example/state.json --title "Example skill" --product agent-skill --tag sensitive-data
-python -m src.adp_discovery show .discovery/example/state.json
-```
+An explicitly confirmed product can have unknown tag facts. Record tags as
+present or absent when supported and leave the others undeclared. A confirmed
+profile change appends a snapshot. Compare the old and new checklists, resolve
+questions that became irrelevant with a reason, and reopen questions or
+decisions affected by new evidence. Attach existing evidence to a newly
+available dimension when the original statement applies.
 
-Use tag definitions from `catalog` to explain why the proposed tags apply.
-Clarify unknown tag facts that could change the checklist before initialization.
-Use the catalog order as a checklist order and prioritize blockers independently.
-For a new thread, obtain the workspace path or find the matching local slug and
-load persisted state before relying on recollection.
+## Select the next batch
 
-## Save after an answer
+1. Match the brief and latest replies against existing questions and dimensions.
+   Close answered questions with links to their evidence. Ask follow-ups only
+   for boundaries or consequences that remain unclear.
+2. Record open questions with stable IDs. Add prerequisites only when their
+   answers are needed to ask the dependent question meaningfully. Leave a
+   classification or applicability question unscoped if it precedes the
+   corresponding dimension.
+3. Prioritize contradictions and gaps that block the baseline or several other
+   questions. Then consider the consequences of a wrong assumption and the cost
+   of resolving it. Use checklist order to break ties.
+4. Choose one to three closely related eligible questions for the frontier.
+   Save the IDs in asking order. When a stakeholder says the answer is unknown
+   or must wait, keep the question open and defer it when useful. Reconsider it
+   after a relevant change. A dismissed or skipped question stays available
+   under its original ID.
 
-Build the complete candidate from the latest `show` output. Keep the revision
-and profile intact, update the summary where appropriate, and add or update
-records. Pass the candidate on standard input. A stale revision requires a
-fresh load and a merge by record ID.
+Ask neutral questions that expose a consequence or testable assumption. If a
+stakeholder says a team reviews every output, ask who handles exceptions and
+what evidence shows the review happened. Offer choices that represent real
+alternatives and allow the stakeholder's own wording where supported. Defer
+implementation and modeling questions until they affect a discovery decision.
 
-```sh
-python -m src.adp_discovery save .discovery/example/state.json < candidate.json
-```
+## Interpret and save each round
 
-Each record has a permanent `id`, `kind`, `status`, `text`, `dimensions`,
-and `refs`. Use stable lowercase kebab-case IDs. References are record IDs.
-Dimensions come from the saved checklist.
+- **Fact or observation.** Record the claim with a source and relevant dimensions.
+  A stakeholder statement is evidence of what they said. Preserve their
+  uncertainty about the underlying fact.
+- **Preference.** Record what the stakeholder favors and link their statement.
+- **Assumption.** Record the inference, its basis, and what would test it.
+- **Decision.** Record a recommendation as proposed. Use confirmed only after
+  the stakeholder makes or explicitly accepts the decision. Link that evidence.
+- **Contradiction.** Link the conflicting evidence and affected decisions.
+  Explain the consequence and ask which statement governs or whether they apply
+  under different conditions. Reopen affected decisions in the same save. On
+  resolution, attach the clarification and restore the original decision or
+  supersede it with a new record. Preserve both original statements.
 
-- **Evidence** uses status `recorded`, requires a source, and has empty refs.
-  Summarize what was observed and where it came from. A stakeholder statement is
-  evidence of their stated intent. Use minimal necessary detail.
-- **Decisions** use `proposed`, `confirmed`, `reopened`, or `superseded`.
-  A confirmed decision links to a dimension and recorded evidence. For coverage,
-  tag that evidence with the same dimension. If a stakeholder replaces a
-  previously confirmed decision, preserve its text, supersede it with a
-  resolution naming the replacement, and add the new decision.
-- **Assumptions, risks, questions, and contradictions** use `open` or
-  `resolved`. Supply a resolution when closing a record. Risks and questions
-  require a boolean `blocking` field. Mark one blocking if it prevents a
-  defensible baseline.
-- **Contradictions** reference the related decision or at least two conflicting
-  records. Preserve both statements as evidence where available. In the same
-  save, reopen each confirmed decision referenced by an open contradiction.
-  Restore confirmation only when the conflict is resolved and the evidence
-  supports the original decision.
+Save concise summaries and IDs that a new thread can interpret. On resume,
+load the workspace and inspect its readiness, saved batch, and eligible
+questions. Summarize confirmed decisions and blockers briefly. Reuse the
+saved batch unless a new reply or source changes it.
 
-## Export for review
-
-```sh
-python -m src.adp_discovery report .discovery/example/state.json --format json
-python -m src.adp_discovery report .discovery/example/state.json > .discovery/example/baseline.md
-```
-
-The report reads state and includes a brief, decisions, open questions, other
-ledger records, and evidence-backed readiness. Review the substance with the
-stakeholder, especially evidence quality and unresolved nonblocking issues.
+If the batch is empty, check gaps, unknown applicability, deferred questions,
+and blockers. A dimension can have evidence while still lacking confirmation
+for readiness. Review whether the evidence is sufficient and who approves
+the baseline. Generate a Markdown baseline on request or at a review
+checkpoint. Leave ADRs out of exploratory questioning.

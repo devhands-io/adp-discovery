@@ -12,15 +12,17 @@ the current session provides one you can use. Submit the question through
 the dialog. Offer choices when they represent real alternatives, and allow
 a free-text answer when the dialog supports it.
 
-If the session has no usable question dialog, briefly tell the stakeholder
-and ask in chat. If the stakeholder dismisses a dialog or leaves a question
-unanswered, keep it open. Wait for an explicit reply before confirming a
-decision or taking a step that depends on the answer.
+If the dialog is unavailable in the current session or mode, say so briefly
+when asking in chat. If the stakeholder dismisses a dialog or leaves a
+question unanswered, keep it open. Wait for an explicit reply before
+confirming a decision or taking a step that depends on the answer.
 
 ## Interview workflow
 
-1. Identify the product and discovery workspace. Use `.discovery/<slug>/state.json` by default. If state exists, load it with `show`, summarize the latest confirmed decisions and blockers, then resume at the highest-impact gap. If multiple workspaces fit, ask which one to use.
-2. For a new interview, propose the product classification and applicable tags and verify them with the stakeholder before initialization. Select `general` if no specialized template fits. See [the interview reference](references/workflow.md) for commands and the state contract.
-3. Ask one focused question or a small set of closely related questions. Use the composed checklist, the stakeholder's latest answers, and the consequences of uncertainty to choose what to ask next. Reuse prior answers and defer implementation detail until it affects a decision.
-4. At each meaningful turn, record new evidence with a source, preserve stakeholder-confirmed decisions, label inferences as assumptions or proposals, and save before replying. When answers clash, name the conflicting statements and ask which should hold. Reopen affected decisions until the stakeholder resolves the conflict.
-5. On request or at a natural checkpoint, generate the discovery baseline and interpret the readiness findings. Present blockers with their supporting record IDs and identify the next unresolved decision. Report uncertainty and avoid treating baseline coverage as independent approval.
+1. Find the workspace or start a draft under `.discovery/<slug>/state.json`. On resume, load the saved state, summarize the confirmed decisions and blockers, and use the saved question batch. If several workspaces fit, ask which one to use.
+2. Capture the stated intent and reuse answers from the brief. Propose a product classification from the catalog, use `general` when no specialization fits, and confirm the type and known applicability facts with the stakeholder.
+3. Ask one focused question or a small related batch. Resolve prerequisites and impactful uncertainties first. Record sourced facts, preferences, assumptions, and decisions separately. Only confirm decisions the stakeholder explicitly makes or accepts.
+4. Save each substantive round and the next batch before asking it. Surface conflicting evidence and reopen affected decisions. Revisit an answered question only when new evidence requires it.
+5. Offer baseline review at a natural checkpoint and generate it on request or at that checkpoint. Report gaps and uncertainty. Coverage and an empty batch do not establish stakeholder approval.
+
+Follow the [interview workflow](references/workflow.md) and [state and CLI reference](references/state.md).

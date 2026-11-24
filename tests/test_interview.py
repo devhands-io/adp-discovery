@@ -59,6 +59,9 @@ class InterviewTests(unittest.TestCase):
                 self.assertEqual(report["classification"], "confirmed" if index else "draft")
                 self.assertEqual(report["status"], "gaps-remain")
                 self.assertEqual(report["frontier"], step["frontier"])
+                if index == 0:
+                    rendered = self.command("report", self.path, markdown=True)
+                    self.assertIn("The product classification is awaiting stakeholder confirmation.", rendered)
                 records = {item["id"]: item for item in self.state["records"]}
                 self.assertNotIn("ask-purpose", records)
                 if index == 1:
@@ -85,6 +88,7 @@ class InterviewTests(unittest.TestCase):
         rendered = self.command("report", self.path, markdown=True)
         self.assertIn("Stakeholder preferences", rendered)
         self.assertIn("handling-review", rendered)
+        self.assertIn("Check for missing required decisions, unresolved applicability, or recorded blockers.", rendered)
 
     def test_inapplicable_questions_and_deferred_unknowns(self):
         self.play(0)
@@ -186,6 +190,9 @@ class InterviewTests(unittest.TestCase):
         self.assertEqual(profile["secondary_products"], ["agent-skill"])
         self.assertEqual(profile["overlays"], ["evaluation"])
         self.assertEqual(readiness(self.state)["status"], "baseline-ready")
+        rendered = self.command("report", self.path, markdown=True)
+        self.assertIn("Every applicable required topic has a confirmed, evidence-backed decision.", rendered)
+        self.assertIn("Stakeholders approve the baseline separately.", rendered)
 
     def test_linked_confirmed_decision_must_reopen(self):
         for index in range(3):

@@ -18,10 +18,11 @@ template. Applicability tags describe independent facts about the product.
 ## Interview interaction contract
 
 The skill asks stakeholder questions through the host's built-in dialog when
-the session provides one. Otherwise it explains the fallback and asks in chat.
-An unanswered question stays open. Confirmation and dependent steps require
-an explicit stakeholder reply. Python commands operate on the resulting
-workspace state.
+the session provides one. If the session has no dialog, the skill explains the
+fallback and asks in chat. Each prompt appears once per round. An unanswered
+question stays open. Confirmation and dependent steps require an explicit
+stakeholder reply. Starting a live pilot requires approval for the interview
+itself. Python commands operate on the resulting workspace state.
 
 ## Catalog contract
 
@@ -122,3 +123,5 @@ approve the baseline independently of the question frontier.
 
 The Markdown export is a point-in-time review of one state revision. JSON
 report output gives machine-readable preliminary readiness findings.
+The v2 Markdown report explains the computed status and identifies stakeholder
+approval as a separate step.

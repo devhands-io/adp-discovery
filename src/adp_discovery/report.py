@@ -118,6 +118,17 @@ def markdown(state):
         lines.extend(["", f"## {heading}", "", *(entries or [empty])])
 
     lines.extend(["", "## Preliminary readiness", "", f"Status: `{report['status']}`", ""])
+    if state["version"] == 2:
+        if report["classification"] == "draft":
+            explanation = "The product classification is awaiting stakeholder confirmation."
+        elif report["status"] == "baseline-ready":
+            explanation = (
+                "Every applicable required topic has a confirmed, evidence-backed decision. "
+                "No blockers are recorded."
+            )
+        else:
+            explanation = "Check for missing required decisions, unresolved applicability, or recorded blockers."
+        lines.extend([explanation, "", "Stakeholders approve the baseline separately.", ""])
     for finding in report["findings"]:
         key = finding["dimension"]
         if finding["status"] == "gap":

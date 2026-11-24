@@ -37,7 +37,7 @@ Replay the [meeting decision register pilot](../examples/meeting-notes/pilot.md)
 | Unknown and inapplicable dimensions | Confirm the product while sensitivity is unknown. Security is absent from the active checklist and its dimensions show unknown applicability. Confirming sensitive inputs makes the related questions eligible after prerequisites resolve. Confirming public inputs and no external actions makes Security inapplicable. |
 | Distinct records | Evidence, preferences, assumptions, proposals, and explicit decisions retain distinct types or statuses across rounds. Recommendations stay proposed when the stakeholder has only expressed a preference. |
 | Dependency and contradiction | A blocked or deferred question stays out of the batch. Conflicting evidence reopens the affected decision and surfaces a blocker. Resolving the conflict preserves both statements and the superseded wording. |
-| Checkpoint | An empty batch with unresolved required gaps remains unready. Stakeholders review evidence and approve the baseline independently of coverage. |
+| Checkpoint | An empty batch with unresolved required gaps remains unready. The v2 Markdown report explains draft, gaps, and ready statuses and identifies stakeholder approval as a separate step. |
 | Legacy compatibility | The v1 pilot export is unchanged. Explicitly upgrading a copy preserves the checklist, record IDs, and blocker findings. Unknown template versions are visible in the upgraded state. |
 
 ## Stakeholder question delivery
@@ -47,6 +47,35 @@ confirmation. Use a separate discovery workspace for each run.
 
 | Session | Acceptance condition |
 | --- | --- |
-| Built-in question dialog available | The first confirmation appears in the dialog without a duplicate question in chat. Submit a correction through the dialog and verify that the saved profile reflects the reply. The next unresolved question also appears in a dialog. |
+| Built-in question dialog available | Each round presents its questions once in the dialog. Submit a correction and verify that the saved profile reflects it. The next unresolved question also appears once in a dialog. Chat can acknowledge the round. |
 | Built-in question dialog unavailable | The agent briefly explains the fallback and asks in chat. Reply in chat and verify that the saved profile reflects the reply. |
 | Dialog dismissed or unanswered | Leave the first confirmation unanswered. Verify that the draft exists, keeps the same question open, and has no confirmed profile. Resume from the same path and verify that it still awaits an explicit reply. |
+
+## Live pilot review
+
+Before a live pilot, agree on the product, rubric, and intended outputs, then
+get approval to begin the interview. Approval to maintain the framework
+covers maintenance. During the interview, reuse earlier answers and ask one
+focused question or a small related batch.
+
+Rate each item as pass, partial, or fail and cite an observation. A pass meets
+the check below, a partial leaves part unverified or unmet, and a fail records
+a direct miss. Baseline coherence, traceability, and applicability must pass
+for pilot acceptance.
+
+| Criterion | What to check |
+| --- | --- |
+| Baseline coherence | The brief, decision register, and preliminary readiness describe the same product and expose material gaps. |
+| Traceability | Confirmed decisions link to stakeholder evidence. Assumptions and risks are explicit. |
+| Applicability | The profile matches confirmed facts. Composition checks exercise applicable, unresolved, and excluded cases. |
+| Relevance | Questions help settle a decision or close a material evidence gap. |
+| Clarity | The stakeholder can understand each question and answer it in their own terms. |
+| Redundancy | The interviewer reuses prior answers and delivers each prompt once per round. |
+| Missing coverage | The interview covers required topics or records the remaining gaps. |
+| Premature design assumptions | Questions establish outcomes and constraints before settling design choices. |
+| Context efficiency | Each round is short, and the saved batch is sufficient to resume. |
+| Framework findings | The report distinguishes product findings from framework defects and links proposed fixes to observations. |
+
+Save the traceable state and generate the baseline from it. Keep the scored
+review separate from product findings and obtain approval before implementing
+any proposed framework fixes.

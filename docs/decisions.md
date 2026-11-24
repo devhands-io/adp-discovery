@@ -15,6 +15,8 @@
 | Persist draft interviews and append confirmed profiles in v2 | Save the intent and first question before confirmation. Later changes keep their earlier checklist and evidence links. Explicit upgrades preserve legacy workspaces and record unknown provenance. |
 | Store question dependencies and an ordered batch of IDs | The interview skill ranks meaningful questions. Python validates the dependency graph and eligibility, and a new thread can recover the batch without duplicating question text. |
 | Derive readiness from applicability and evidence | Required unknown applicability stays visible as a gap. Confirmed exclusions and optional gaps can be reported without imposing coverage or implying stakeholder approval. |
+| Explain readiness in v2 Markdown | A short explanation helps stakeholders interpret the status at a glance. The status values and JSON output remain compatible. |
+| Keep pilot evaluation outside the interview | Maintainers agree on the rubric and get approval for the live session before opening a dialog. Stakeholders answer only the product questions. |
 
 ## Subsequent slices
 

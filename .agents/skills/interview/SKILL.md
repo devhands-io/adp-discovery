@@ -5,12 +5,17 @@ description: Run or resume a product discovery interview. Use when a stakeholder
 
 # Discovery interview
 
+Start or resume when the stakeholder requests an interview or explicitly
+approves the proposed live session. Treat approval to edit the framework
+as permission for maintenance.
+
 ## Ask through the host's built-in dialog
 
 Use the host's built-in question dialog for every stakeholder question when
-the current session provides one you can use. Submit the question through
-the dialog. Offer choices when they represent real alternatives, and allow
-a free-text answer when the dialog supports it.
+the current session provides one you can use. Present each question once
+per round in that dialog. Keep any accompanying chat to a short progress
+update. Offer choices when they represent real alternatives, and allow a
+free-text answer when the dialog supports it.
 
 If the dialog is unavailable in the current session or mode, say so briefly
 when asking in chat. If the stakeholder dismisses a dialog or leaves a

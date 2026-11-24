@@ -16,29 +16,98 @@ requirements, and `model-product` for modeling the product.
 
 ## Try the interview skill
 
-### 1. Open the project
+Already have the project and a Python environment with its dependencies?
+Jump to [Start a sample interview](#2-start-a-sample-interview). You can send
+the prompt as soon as the agent has the project open. The Python dependencies
+are needed when the skill runs commands to load the checklist, save progress,
+or export a baseline.
 
-Get a copy of the full repository, including the hidden `.agents/` folder, and
-open the repository root as a workspace in an agent host that can load the
-skill. With Python 3.10 or newer, run these commands from the repository root:
+### 1. Get the project and set up Python once
+
+**Download ZIP.** [Download the ZIP from GitHub](https://github.com/devhands-io/adp-discovery/archive/refs/heads/main.zip),
+unzip it, and open a terminal in the extracted `adp-discovery-main` folder.
+On GitHub, you can also choose **Code → Download ZIP**.
+
+**Or use Git.** Paste these commands into your terminal:
 
 ```sh
+git clone https://github.com/devhands-io/adp-discovery.git
+cd adp-discovery
+```
+
+Both options include the skill, templates, and Python code. If you need to set
+up Python for this project, run the commands for your system from the project
+folder with Python 3.10 or newer. A virtual environment is recommended to keep
+dependencies isolated. If the agent can already use a Python environment with
+the packages in `requirements.txt`, skip environment creation and installation.
+
+**macOS or Linux**
+
+```sh
+# Create an isolated Python environment in the .venv folder.
 python3 -m venv .venv
+
+# Select that environment's Python for this terminal session.
 source .venv/bin/activate
+
+# Install the project's Python dependencies into the active environment.
 python -m pip install -r requirements.txt
+
+# Optional. Check the catalog and confirm the project commands run.
 python -m src.adp_discovery validate
 ```
 
-On Windows PowerShell, create the environment with `py -m venv .venv`, then
-activate it with `.\.venv\Scripts\Activate.ps1` before installing dependencies.
+Activation is optional when you call `.venv/bin/python` directly in place of
+`python`, including from a new terminal or agent session.
+
+**Windows PowerShell**
+
+```powershell
+# Create an isolated Python environment in the .venv folder.
+py -m venv .venv
+
+# Use that environment's Python directly to install the dependencies.
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# Optional. Check the catalog and confirm the project commands run.
+.\.venv\Scripts\python.exe -m src.adp_discovery validate
+```
+
+The optional check prints `Catalog valid.` when it succeeds.
 
 ### 2. Start a sample interview
 
-Load the interview skill from `.agents/skills/interview/SKILL.md` using your
-host's supported method. Then send this prompt or swap in an idea of your own.
+Open the project folder in your agent app or launch its CLI from that folder.
+Use the prompt for your agent, or swap in an idea of your own.
 
-> Help me discover a skill that turns meeting notes into a decision
-> register. Save progress under .discovery/meeting-decisions/.
+#### Codex
+
+Codex discovers the interview skill in `.agents/skills/`. Mention `$interview`
+in your prompt. [Codex skills documentation](https://learn.chatgpt.com/docs/build-skills)
+
+> $interview Help me discover a skill that turns meeting notes into a decision
+> register. Save progress under `.discovery/meeting-decisions/`.
+
+#### Claude Code
+
+Claude Code looks for project skills in `.claude/skills/`. Use the skill
+directly from its existing project path by asking Claude Code to read it.
+[Claude Code skills documentation](https://code.claude.com/docs/en/skills#skills-locations)
+
+> Read and follow `.agents/skills/interview/SKILL.md`. Help me discover a
+> skill that turns meeting notes into a decision register. Save progress under
+> `.discovery/meeting-decisions/`.
+
+#### OpenCode
+
+OpenCode discovers project skills in `.agents/skills/`. Mention `@interview`
+in your prompt. If your version does not recognize that mention, use the
+file-based prompt above. [OpenCode skills documentation](https://opencode.ai/docs/skills/)
+
+> @interview Help me discover a skill that turns meeting notes into a decision
+> register. Save progress under `.discovery/meeting-decisions/`.
+
+#### During the interview
 
 Confirm or correct the proposed product type and tags, then answer two or three
 follow-up questions. For the sample, you could say that the register is for the
@@ -51,11 +120,11 @@ without one, the agent asks in chat.
 
 ### 3. Resume and export
 
-Start a fresh chat in the same workspace, load the interview skill, and use
-the saved state to pick up where you left off.
+Start a fresh chat in the same folder and paste this prompt.
 
-> Resume .discovery/meeting-decisions/state.json and continue from the
-> highest-impact unresolved question.
+> Read and follow `.agents/skills/interview/SKILL.md`. Resume
+> `.discovery/meeting-decisions/state.json` and continue from the highest-impact
+> unresolved question.
 
 Then ask for a baseline, even if the interview is still in progress.
 
@@ -82,14 +151,14 @@ details removed.
 
 ## Command-line reference
 
-You can also inspect state and export directly from the repository root with
-the virtual environment active.
+Run these commands from the project folder. On Windows PowerShell, use
+`.\.venv\Scripts\python.exe` in place of `.venv/bin/python`.
 
 ```sh
-python -m src.adp_discovery catalog
-python -m src.adp_discovery show .discovery/meeting-decisions/state.json
-python -m src.adp_discovery report .discovery/meeting-decisions/state.json > .discovery/meeting-decisions/baseline.md
-python -m src.adp_discovery report .discovery/meeting-decisions/state.json --format json
+.venv/bin/python -m src.adp_discovery catalog
+.venv/bin/python -m src.adp_discovery show .discovery/meeting-decisions/state.json
+.venv/bin/python -m src.adp_discovery report .discovery/meeting-decisions/state.json > .discovery/meeting-decisions/baseline.md
+.venv/bin/python -m src.adp_discovery report .discovery/meeting-decisions/state.json --format json
 ```
 
 Working state and exports placed in `.discovery/` are local and Git-ignored.
@@ -102,7 +171,7 @@ project brief to discover the framework's first interview skill. Replay its
 [checked-in state](examples/self-discovery/state.json):
 
 ```sh
-python -m src.adp_discovery report examples/self-discovery/state.json
+.venv/bin/python -m src.adp_discovery report examples/self-discovery/state.json
 ```
 
 You can also open the [generated pilot baseline](examples/self-discovery/baseline.md).

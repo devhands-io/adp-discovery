@@ -1,0 +1,205 @@
+import copy
+import json
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+import yaml
+
+from src.adp_discovery.core import ROOT, Catalog, DiscoveryError
+from src.adp_discovery.report import readiness
+from src.adp_discovery.state import initialize, load_state, save, validate_state
+
+
+def record(key, kind, status, dimensions, refs=(), **details):
+    return {
+        "id": key, "kind": kind, "status": status, "text": key,
+        "dimensions": list(dimensions), "refs": list(refs), **details,
+    }
+
+
+class CatalogTests(unittest.TestCase):
+    def setUp(self):
+        self.catalog = Catalog(ROOT / "templates")
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.path = Path(directory.name) / "templates"
+        shutil.copytree(ROOT / "templates", self.path)
+
+    def change_overlay(self, transform):
+        path = self.path / "overlays" / "security.yaml"
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        transform(data)
+        path.write_text(yaml.safe_dump(data), encoding="utf-8")
+
+    def test_composition_is_ordered_and_repeatable(self):
+        first = self.catalog.compose("agent-skill", ["sensitive-data", "external-actions"])
+        second = self.catalog.compose("agent-skill", ["external-actions", "sensitive-data"])
+        self.assertEqual(first, second)
+        self.assertEqual(first["overlays"], ["evaluation", "security"])
+        sources = [item["source"] for item in first["dimensions"]]
+        self.assertEqual(sources, ["general"] * 5 + ["agent-skill"] * 4 + ["evaluation"] * 2 + ["security"] * 2)
+        self.assertEqual(self.catalog.compose("agent-skill", [])["overlays"], ["evaluation"])
+        self.assertEqual(self.catalog.compose("general", [])["overlays"], [])
+        self.assertEqual(self.catalog.compose("general", ["external-actions"])["overlays"], ["security"])
+
+    def test_nested_rule_and_unknown_references(self):
+        self.change_overlay(lambda data: data.update(applies={"all": [
+            {"any": [{"product": "general"}, {"tag": "external-actions"}]},
+            {"not": {"tag": "sensitive-data"}},
+        ]}))
+        catalog = Catalog(self.path)
+        self.assertEqual(catalog.compose("general", [])["overlays"], ["security"])
+        self.assertEqual(catalog.compose("general", ["sensitive-data"])["overlays"], [])
+        self.assertEqual(catalog.compose("agent-skill", ["external-actions"])["overlays"], ["evaluation", "security"])
+        self.change_overlay(lambda data: data["applies"]["all"][0]["any"].append({"product": "unknown"}))
+        with self.assertRaisesRegex(DiscoveryError, "unknown product 'unknown'"):
+            Catalog(self.path)
+        self.change_overlay(lambda data: data.update(applies={"not": {"tag": "unknown"}}))
+        with self.assertRaisesRegex(DiscoveryError, "unknown tag 'unknown'"):
+            Catalog(self.path)
+
+    def test_invalid_catalog_shapes_and_duplicate_dimensions(self):
+        self.change_overlay(lambda data: data["dimensions"][0].update(id="purpose"))
+        with self.assertRaisesRegex(DiscoveryError, "duplicate dimension ID 'purpose'"):
+            Catalog(self.path)
+        self.change_overlay(lambda data: data.update(applies={"any": []}))
+        with self.assertRaisesRegex(DiscoveryError, "applies"):
+            Catalog(self.path)
+        path = self.path / "products" / "agent-skill.yaml"
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write("\nid: agent-skill\n")
+        with self.assertRaisesRegex(DiscoveryError, "duplicate key 'id'"):
+            Catalog(self.path)
+
+    def test_unknown_classification_is_rejected(self):
+        with self.assertRaisesRegex(DiscoveryError, "unknown product"):
+            self.catalog.compose("building", [])
+        with self.assertRaisesRegex(DiscoveryError, "unknown tags"):
+            self.catalog.compose("general", ["typo"])
+
+
+class StateTests(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.path = Path(directory.name) / "work" / "state.json"
+        self.profile = Catalog(ROOT / "templates").compose("general", [])
+        self.state = initialize(self.path, "Discovery", self.profile)
+
+    def test_requires_evidence_and_valid_references(self):
+        item = record("decision", "decision", "confirmed", ["purpose"])
+        self.state["records"].append(item)
+        with self.assertRaisesRegex(DiscoveryError, "require a dimension and evidence"):
+            save(self.path, self.state)
+        item["refs"] = ["missing"]
+        with self.assertRaisesRegex(DiscoveryError, "unknown records missing"):
+            save(self.path, self.state)
+        item["dimensions"] = ["does-not-exist"]
+        with self.assertRaisesRegex(DiscoveryError, "unknown dimensions"):
+            save(self.path, self.state)
+        self.assertEqual(load_state(self.path)["revision"], 0)
+
+    def test_preliminary_readiness_and_contradiction_lifecycle(self):
+        dimensions = [item["id"] for item in self.profile["dimensions"]]
+        self.assertEqual(readiness(self.state)["status"], "gaps-remain")
+        self.state["records"].extend([
+            record("owner-statement", "evidence", "recorded", dimensions, source="Stakeholder interview"),
+            record("agreed-baseline", "decision", "confirmed", dimensions, ["owner-statement"]),
+        ])
+        current = save(self.path, self.state)
+        report = readiness(current)
+        self.assertEqual(report["status"], "baseline-ready")
+        self.assertEqual(report["findings"][0]["support"], {"agreed-baseline": ["owner-statement"]})
+
+        current["records"].append(record(
+            "scope-conflict", "contradiction", "open", ["scope"], ["agreed-baseline"]
+        ))
+        with self.assertRaisesRegex(DiscoveryError, "reopen linked confirmed decisions"):
+            save(self.path, current)
+        current["records"][1]["status"] = "reopened"
+        current = save(self.path, current)
+        self.assertEqual(readiness(current)["blockers"], ["agreed-baseline", "scope-conflict"])
+        current["records"][1]["status"] = "confirmed"
+        current["records"][2].update(status="resolved", resolution="Stakeholder confirmed the prior answer.")
+        self.assertEqual(readiness(save(self.path, current))["status"], "baseline-ready")
+
+    def test_stale_save_and_mutation_protections(self):
+        before = copy.deepcopy(self.state)
+        before["summary"] = "Saved by the first writer."
+        before["records"] = [record("source", "evidence", "recorded", ["purpose"], source="Interview")]
+        current = save(self.path, before)
+        with self.assertRaisesRegex(DiscoveryError, "stale revision"):
+            save(self.path, self.state)
+        with self.assertRaisesRegex(DiscoveryError, "state already exists"):
+            initialize(self.path, "Other", self.profile)
+        rewritten = copy.deepcopy(current)
+        rewritten["records"][0]["text"] = "Different evidence."
+        with self.assertRaisesRegex(DiscoveryError, "retain evidence"):
+            save(self.path, rewritten)
+        rewritten = copy.deepcopy(current)
+        rewritten["profile"]["dimensions"][0]["required"] = False
+        with self.assertRaisesRegex(DiscoveryError, "immutable"):
+            save(self.path, rewritten)
+        self.assertEqual(load_state(self.path), current)
+
+    def test_generic_contract_and_building_keep_domain_gaps(self):
+        for question, source in (
+            ("Which authority approves the site plan?", "Site discovery workshop"),
+            ("Who will review jurisdiction and remedies?", "Contract owner interview"),
+        ):
+            with self.subTest(question=question):
+                self.state["records"] = [
+                    record("scope-source", "evidence", "recorded", ["scope"], source=source),
+                    record("scope-decision", "decision", "confirmed", ["scope"], ["scope-source"]),
+                    {**record("domain-review", "question", "open", ["constraints"], blocking=True),
+                     "text": question},
+                ]
+                validate_state(self.state)
+                report = readiness(self.state)
+                self.assertEqual(report["status"], "gaps-remain")
+                self.assertEqual(report["blockers"], ["domain-review"])
+                self.assertEqual(self.state["profile"]["overlays"], [])
+
+
+class CliTests(unittest.TestCase):
+    def command(self, *args, candidate=None):
+        result = subprocess.run(
+            [sys.executable, "-m", "src.adp_discovery", *args], cwd=ROOT,
+            input=json.dumps(candidate) if candidate is not None else None,
+            capture_output=True, encoding="utf-8", timeout=15,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout
+
+    def test_resume_and_export_in_separate_processes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = str(Path(directory) / "state.json")
+            state = json.loads(self.command("init", path, "--product", "agent-skill", "--title", "Pilot"))
+            state["records"] = [
+                record("owner", "evidence", "recorded", ["purpose"], source="Owner interview"),
+                record("purpose-agreed", "decision", "confirmed", ["purpose"], ["owner"]),
+            ]
+            self.command("save", path, candidate=state)
+            resumed = json.loads(self.command("show", path))
+            self.assertEqual(resumed["revision"], 1)
+            self.assertEqual(resumed["records"][1]["status"], "confirmed")
+            rendered = self.command("report", path)
+            self.assertIn("## Open questions", rendered)
+            self.assertIn("covered by `purpose-agreed` with owner", rendered)
+            self.assertIn("`invocation` has a gap", rendered)
+
+    def test_checked_in_pilot_export_is_reproducible(self):
+        folder = ROOT / "examples" / "self-discovery"
+        output = self.command("report", str(folder / "state.json"))
+        self.assertEqual(output, (folder / "baseline.md").read_text(encoding="utf-8"))
+        report = json.loads(self.command("report", str(folder / "state.json"), "--format", "json"))
+        self.assertEqual(report["status"], "gaps-remain")
+        self.assertIn("handling-confirmation", report["blockers"])
+
+
+if __name__ == "__main__":
+    unittest.main()

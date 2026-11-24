@@ -1,0 +1,14 @@
+id: agent-skill
+dimensions:
+  - id: invocation
+    question: What should trigger the skill, and when should it ask for clarification?
+    required: true
+  - id: outputs
+    question: What should the skill produce, and what happens when a needed input is missing?
+    required: true
+  - id: handoff
+    question: What must another session or person be able to recover and verify?
+    required: true
+  - id: adjacent-skills
+    question: Which adjacent skills or workflows share responsibilities or inputs?
+    required: false

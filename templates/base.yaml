@@ -1,0 +1,21 @@
+id: general
+tags:
+  sensitive-data: The product handles sensitive information.
+  external-actions: The product can affect systems, people, or assets outside its workspace.
+  repeatable-quality: The product needs repeatable evaluation against defined outcomes.
+dimensions:
+  - id: purpose
+    question: What outcome should the product achieve, and for whom?
+    required: true
+  - id: scope
+    question: What work belongs inside the product's scope, and where are its boundaries?
+    required: true
+  - id: stakeholders
+    question: Who uses, approves, or is affected by this product?
+    required: true
+  - id: success
+    question: What observable result would tell stakeholders that the product works?
+    required: true
+  - id: constraints
+    question: What limits, dependencies, or obligations shape the product?
+    required: true

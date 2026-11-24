@@ -1,0 +1,12 @@
+id: security
+applies:
+  any:
+    - tag: sensitive-data
+    - tag: external-actions
+dimensions:
+  - id: authority
+    question: Which actions require approval, and who can grant it?
+    required: true
+  - id: information-handling
+    question: What information may be accessed, retained, or shared, and by whom?
+    required: true

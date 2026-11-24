@@ -1,0 +1,288 @@
+{
+  "version": 1,
+  "revision": 2,
+  "title": "adp-discovery interview skill",
+  "summary": "The first adp-discovery skill guides a stakeholder from a product idea to a reviewable discovery baseline. A later Codex session can continue from the saved checklist and decision register. This replay uses the supplied brief as its evidence and leaves workspace handling and acceptance details open.",
+  "profile": {
+    "product": "agent-skill",
+    "tags": [
+      "sensitive-data"
+    ],
+    "overlays": [
+      "evaluation",
+      "security"
+    ],
+    "dimensions": [
+      {
+        "id": "purpose",
+        "question": "What outcome should the product achieve, and for whom?",
+        "required": true,
+        "source": "general"
+      },
+      {
+        "id": "scope",
+        "question": "What work belongs inside the product's scope, and where are its boundaries?",
+        "required": true,
+        "source": "general"
+      },
+      {
+        "id": "stakeholders",
+        "question": "Who uses, approves, or is affected by this product?",
+        "required": true,
+        "source": "general"
+      },
+      {
+        "id": "success",
+        "question": "What observable result would tell stakeholders that the product works?",
+        "required": true,
+        "source": "general"
+      },
+      {
+        "id": "constraints",
+        "question": "What limits, dependencies, or obligations shape the product?",
+        "required": true,
+        "source": "general"
+      },
+      {
+        "id": "invocation",
+        "question": "What should trigger the skill, and when should it ask for clarification?",
+        "required": true,
+        "source": "agent-skill"
+      },
+      {
+        "id": "outputs",
+        "question": "What should the skill produce, and what happens when a needed input is missing?",
+        "required": true,
+        "source": "agent-skill"
+      },
+      {
+        "id": "handoff",
+        "question": "What must another session or person be able to recover and verify?",
+        "required": true,
+        "source": "agent-skill"
+      },
+      {
+        "id": "adjacent-skills",
+        "question": "Which adjacent skills or workflows share responsibilities or inputs?",
+        "required": false,
+        "source": "agent-skill"
+      },
+      {
+        "id": "evaluation-cases",
+        "question": "Which representative cases should demonstrate success, failure, and recovery?",
+        "required": true,
+        "source": "evaluation"
+      },
+      {
+        "id": "acceptance-owner",
+        "question": "Who reviews the results, and what evidence is sufficient for acceptance?",
+        "required": true,
+        "source": "evaluation"
+      },
+      {
+        "id": "authority",
+        "question": "Which actions require approval, and who can grant it?",
+        "required": true,
+        "source": "security"
+      },
+      {
+        "id": "information-handling",
+        "question": "What information may be accessed, retained, or shared, and by whom?",
+        "required": true,
+        "source": "security"
+      }
+    ]
+  },
+  "records": [
+    {
+      "id": "brief-purpose",
+      "kind": "evidence",
+      "status": "recorded",
+      "text": "The brief asks for a complete discovery workflow for an unfamiliar product and recommends discovering the framework itself first.",
+      "dimensions": [
+        "purpose",
+        "stakeholders",
+        "success"
+      ],
+      "refs": [],
+      "source": "Supplied brief, development strategy and first success criterion"
+    },
+    {
+      "id": "discovery-goal",
+      "kind": "decision",
+      "status": "confirmed",
+      "text": "Help the project stakeholder turn a product idea into a reviewable baseline that can be resumed and checked.",
+      "dimensions": [
+        "purpose",
+        "stakeholders",
+        "success"
+      ],
+      "refs": [
+        "brief-purpose"
+      ]
+    },
+    {
+      "id": "brief-first-slice",
+      "kind": "evidence",
+      "status": "recorded",
+      "text": "The brief describes a Discovery-only first slice built from a reusable catalog and one working interview skill, followed by additional skills.",
+      "dimensions": [
+        "scope",
+        "constraints",
+        "invocation"
+      ],
+      "refs": [],
+      "source": "Supplied brief, milestones and implementation split"
+    },
+    {
+      "id": "first-slice",
+      "kind": "decision",
+      "status": "confirmed",
+      "text": "Focus the first version on the Discovery phase with the interview skill and local workspace files.",
+      "dimensions": [
+        "scope",
+        "constraints"
+      ],
+      "refs": [
+        "brief-first-slice"
+      ]
+    },
+    {
+      "id": "codex-invocation",
+      "kind": "decision",
+      "status": "confirmed",
+      "text": "Expose the workflow as the repository's interview skill, invokable with $interview.",
+      "dimensions": [
+        "invocation"
+      ],
+      "refs": [
+        "brief-first-slice"
+      ]
+    },
+    {
+      "id": "brief-handoff",
+      "kind": "evidence",
+      "status": "recorded",
+      "text": "The brief requires an interrupted interview to continue in a fresh thread without losing confirmed decisions.",
+      "dimensions": [
+        "handoff"
+      ],
+      "refs": [],
+      "source": "Supplied brief, interview milestone"
+    },
+    {
+      "id": "resume-from-state",
+      "kind": "decision",
+      "status": "confirmed",
+      "text": "Use saved workspace state as the source for resuming a discovery interview.",
+      "dimensions": [
+        "handoff"
+      ],
+      "refs": [
+        "brief-handoff"
+      ]
+    },
+    {
+      "id": "brief-artifacts",
+      "kind": "evidence",
+      "status": "recorded",
+      "text": "The first pilot should produce a coherent brief, decision register, open questions, and a preliminary readiness assessment.",
+      "dimensions": [
+        "outputs"
+      ],
+      "refs": [],
+      "source": "Supplied brief, complete pilot milestone"
+    },
+    {
+      "id": "reviewable-baseline",
+      "kind": "decision",
+      "status": "confirmed",
+      "text": "Export the brief, confirmed decisions, open questions, and preliminary readiness from saved state.",
+      "dimensions": [
+        "outputs"
+      ],
+      "refs": [
+        "brief-artifacts"
+      ]
+    },
+    {
+      "id": "brief-tests",
+      "kind": "evidence",
+      "status": "recorded",
+      "text": "The brief calls for an independent acceptance check and scenarios involving an incomplete idea, conflicting answers, and interruption.",
+      "dimensions": [
+        "evaluation-cases"
+      ],
+      "refs": [],
+      "source": "Supplied brief, regression scenarios"
+    },
+    {
+      "id": "independent-checks",
+      "kind": "decision",
+      "status": "confirmed",
+      "text": "Check normal discovery, incomplete input, contradiction recovery, and resumption with tests independent of the skill's judgment.",
+      "dimensions": [
+        "evaluation-cases"
+      ],
+      "refs": [
+        "brief-tests"
+      ]
+    },
+    {
+      "id": "workspace-sensitivity",
+      "kind": "assumption",
+      "status": "open",
+      "text": "Interview content may contain sensitive stakeholder information. The pilot applies the Security overlay on this assumption.",
+      "dimensions": [
+        "information-handling"
+      ],
+      "refs": []
+    },
+    {
+      "id": "handling-confirmation",
+      "kind": "question",
+      "status": "open",
+      "text": "Which interview content may the team retain and share, and who may access the workspace?",
+      "dimensions": [
+        "information-handling"
+      ],
+      "refs": [
+        "workspace-sensitivity"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "authority-review",
+      "kind": "question",
+      "status": "open",
+      "text": "Who can authorize sharing or exporting stakeholder evidence outside the interview workspace?",
+      "dimensions": [
+        "authority"
+      ],
+      "refs": [],
+      "blocking": true
+    },
+    {
+      "id": "acceptance-review",
+      "kind": "question",
+      "status": "open",
+      "text": "Who will sign off on the first live interview and which observations will they require?",
+      "dimensions": [
+        "acceptance-owner"
+      ],
+      "refs": [],
+      "blocking": true
+    },
+    {
+      "id": "future-skill-ownership",
+      "kind": "question",
+      "status": "open",
+      "text": "What overlap will need a clear ownership rule when the companion skills are introduced?",
+      "dimensions": [
+        "adjacent-skills"
+      ],
+      "refs": [],
+      "blocking": false
+    }
+  ]
+}

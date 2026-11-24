@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "revision", "title", "summary", "profile", "records"],
+  "properties": {
+    "version": {"const": 1, "type": "integer"},
+    "revision": {"type": "integer", "minimum": 0},
+    "title": {"$ref": "#/$defs/text"},
+    "summary": {"type": "string"},
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product", "tags", "overlays", "dimensions"],
+      "properties": {
+        "product": {"$ref": "#/$defs/id"},
+        "tags": {"$ref": "#/$defs/ids"},
+        "overlays": {"$ref": "#/$defs/ids"},
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "question", "required", "source"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "question": {"$ref": "#/$defs/text"},
+              "required": {"type": "boolean"},
+              "source": {"$ref": "#/$defs/id"}
+            }
+          }
+        }
+      }
+    },
+    "records": {"type": "array", "items": {"$ref": "#/$defs/record"}}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "text": {"type": "string", "pattern": "\\S"},
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "status", "text", "dimensions", "refs"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["evidence", "decision", "assumption", "risk", "question", "contradiction"]},
+        "status": {"type": "string"},
+        "text": {"$ref": "#/$defs/text"},
+        "dimensions": {"$ref": "#/$defs/ids"},
+        "refs": {"$ref": "#/$defs/ids"},
+        "source": {"$ref": "#/$defs/text"},
+        "blocking": {"type": "boolean"},
+        "resolution": {"$ref": "#/$defs/text"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "evidence"}}},
+          "then": {"required": ["source"], "properties": {"status": {"const": "recorded"}, "refs": {"maxItems": 0}}},
+          "else": {"properties": {"source": false}}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "decision"}}},
+          "then": {"properties": {"status": {"enum": ["proposed", "confirmed", "reopened", "superseded"]}}}
+        },
+        {
+          "if": {"properties": {"kind": {"enum": ["assumption", "risk", "question", "contradiction"]}}},
+          "then": {"properties": {"status": {"enum": ["open", "resolved"]}}}
+        },
+        {
+          "if": {"properties": {"kind": {"enum": ["risk", "question"]}}},
+          "then": {"required": ["blocking"]},
+          "else": {"properties": {"blocking": false}}
+        },
+        {
+          "if": {"properties": {"status": {"enum": ["resolved", "superseded"]}}},
+          "then": {"required": ["resolution"]},
+          "else": {"properties": {"resolution": false}}
+        }
+      ]
+    }
+  }
+}

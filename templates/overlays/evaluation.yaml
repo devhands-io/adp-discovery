@@ -1,0 +1,12 @@
+id: evaluation
+applies:
+  any:
+    - product: agent-skill
+    - tag: repeatable-quality
+dimensions:
+  - id: evaluation-cases
+    question: Which representative cases should demonstrate success, failure, and recovery?
+    required: true
+  - id: acceptance-owner
+    question: Who reviews the results, and what evidence is sufficient for acceptance?
+    required: true

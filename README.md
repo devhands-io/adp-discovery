@@ -1,8 +1,13 @@
-# adp-discovery
+# ADP Discovery
 
-A local product discovery framework for agent hosts that can load its
-interview skill. Use it to turn an early idea into a discovery brief with
-confirmed decisions, open questions, and a preliminary readiness assessment.
+**Devhands ADP (Agentic Development Platform)** is an AI-native software
+development environment where people and agents plan, execute, verify, and
+release work together.
+
+**ADP Discovery** is a local product discovery framework for agent hosts that
+can load its interview skill. Turn an early idea into a reviewable discovery
+brief with confirmed decisions, open questions, and a preliminary readiness
+assessment.
 
 ## Skills
 

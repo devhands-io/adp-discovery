@@ -1,5 +1,11 @@
 version: 1
 id: evaluation
+readiness_criteria:
+  - id: evaluation-plan-review
+    description: The acceptance owner reviews the proposed evaluation cases.
+    kind: review
+    role: acceptance-owner
+    on_failure: block
 applies:
   any:
     - product: agent-skill

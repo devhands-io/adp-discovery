@@ -8,6 +8,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 from .core import DiscoveryError, index_by_id, read_json, validate_schema
+from .discovery import empty_discovery, preserve_discovery, validate_criteria, validate_discovery
 
 
 def current_profile(state):
@@ -88,13 +89,17 @@ def validate_profile(profile, records, index):
 
 
 def validate_state(state):
-    v2 = isinstance(state, dict) and state.get("version") == 2
-    validate_schema("state-v2" if v2 else "state", state, "state")
+    version = state.get("version") if isinstance(state, dict) else None
+    modern = version in (2, 3)
+    schema = {2: "state-v2", 3: "state-v3"}.get(version) if isinstance(version, int) else None
+    validate_schema(schema or "state", state, "state")
     records = index_by_id(state["records"], "records")
-    if v2:
+    if modern:
         dimensions = set()
         for index, profile in enumerate(state["profiles"]):
             dimensions.update(validate_profile(profile, records, index))
+            if version == 3:
+                validate_criteria(profile, index)
         eligible = eligible_questions(state)
         if set(state["frontier"]) - set(eligible):
             raise DiscoveryError("frontier must contain only eligible open questions")
@@ -122,6 +127,8 @@ def validate_state(state):
                 raise DiscoveryError(f"{label}: link a decision or at least two conflicting records")
             if record["status"] == "open" and any(item["status"] == "confirmed" for item in decisions):
                 raise DiscoveryError(f"{label}: reopen linked confirmed decisions while the contradiction is open")
+    if version == 3:
+        validate_discovery(state, records)
 
 
 def load_state(path):
@@ -164,11 +171,13 @@ def initialize(path, title, profile):
     return create_state(path, state)
 
 
-def initialize_draft(path, title, project):
+def initialize_draft(path, title, project, *, artifacts=False):
     state = {
-        "version": 2, "revision": 0, "project": project, "title": title, "summary": "",
+        "version": 3 if artifacts else 2, "revision": 0, "project": project, "title": title, "summary": "",
         "profiles": [], "records": [], "frontier": [],
     }
+    if artifacts:
+        state["discovery"] = empty_discovery()
     return create_state(path, state)
 
 
@@ -182,22 +191,30 @@ def create_state(path, state):
     return state
 
 
-def upgrade(path, project):
+def upgrade(path, project=None, *, target=2):
     with state_lock(path):
         current = load_state(path)
-        if current["version"] != 1:
-            raise DiscoveryError(f"{path}: only version 1 workspaces can be upgraded")
-        profile = current.pop("profile")
-        templates = {"general", profile["product"], *profile["overlays"]}
-        profile.update(
-            secondary_products=[], absent_tags=[], unresolved_overlays=[], unresolved_dimensions=[],
-            inapplicable_overlays=[], inapplicable_dimensions=[],
-            template_versions=dict.fromkeys(sorted(templates)), confirmed_by=[],
-        )
-        for record in current["records"]:
-            if record["kind"] == "question":
-                record["depends_on"] = []
-        current.update(version=2, project=project, revision=current["revision"] + 1, profiles=[profile], frontier=[])
+        if (current["version"], target) not in {(1, 2), (1, 3), (2, 3)}:
+            raise DiscoveryError(f"{path}: cannot upgrade version {current['version']} to version {target}")
+        if current["version"] == 1:
+            if project is None:
+                raise DiscoveryError("a version 1 upgrade requires --project")
+            profile = current.pop("profile")
+            templates = {"general", profile["product"], *profile["overlays"]}
+            profile.update(
+                secondary_products=[], absent_tags=[], unresolved_overlays=[], unresolved_dimensions=[],
+                inapplicable_overlays=[], inapplicable_dimensions=[],
+                template_versions=dict.fromkeys(sorted(templates)), confirmed_by=[],
+            )
+            for record in current["records"]:
+                if record["kind"] == "question":
+                    record["depends_on"] = []
+            current.update(project=project, profiles=[profile], frontier=[])
+        elif project is not None and current["project"] != project:
+            raise DiscoveryError("retain the existing project ID when upgrading version 2")
+        current.update(version=target, revision=current["revision"] + 1)
+        if target == 3:
+            current["discovery"] = empty_discovery()
         validate_state(current)
         write_state(path, current)
     return current
@@ -211,14 +228,18 @@ def save(path, candidate):
             raise DiscoveryError(f"{path}: stale revision, reload revision {current['revision']} and merge your changes")
         if candidate["version"] != current["version"]:
             raise DiscoveryError(f"{path}: state version changes require an explicit upgrade")
-        v2 = current["version"] == 2
-        if v2:
+        modern = current["version"] >= 2
+        if modern:
             count = len(current["profiles"])
             if candidate["project"] != current["project"] or candidate["profiles"][:count] != current["profiles"]:
                 raise DiscoveryError(f"{path}: retain project identity and saved profile history")
             appended = candidate["profiles"][count:]
             if len(appended) > 1 or any(not profile["confirmed_by"] for profile in appended):
                 raise DiscoveryError(f"{path}: save at most one newly confirmed profile per revision")
+            if current["version"] == 3:
+                if any("readiness_criteria" not in profile for profile in appended):
+                    raise DiscoveryError(f"{path}: use profile --artifacts for a version 3 readiness snapshot")
+                preserve_discovery(current, candidate)
         elif candidate["profile"] != current["profile"]:
             raise DiscoveryError(f"{path}: the saved checklist and classification are immutable")
 
@@ -230,14 +251,14 @@ def save(path, candidate):
             updated = proposed[key]
             if previous["kind"] == "evidence":
                 expected = previous
-                if v2 and set(previous["dimensions"]).issubset(updated["dimensions"]):
+                if modern and set(previous["dimensions"]).issubset(updated["dimensions"]):
                     expected = {**previous, "dimensions": updated["dimensions"]}
                 if expected != updated:
                     raise DiscoveryError(f"{path}: retain evidence {key!r} and add a separate record for corrections")
             if previous["kind"] == "decision" and previous["status"] != "proposed":
                 if previous["text"] != updated["text"]:
                     raise DiscoveryError(f"{path}: retain decision {key!r} text and add a record for a replacement")
-                if v2 and (
+                if modern and (
                     updated["status"] == "proposed"
                     or (previous["status"] == "superseded" and updated != previous)
                     or not set(previous["refs"]).issubset(updated["refs"])

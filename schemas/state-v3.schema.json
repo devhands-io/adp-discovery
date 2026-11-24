@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "revision", "title", "summary", "records", "project", "profiles", "frontier", "discovery"],
+  "properties": {
+    "version": {"type": "integer", "const": 3},
+    "revision": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/properties/revision"},
+    "title": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/properties/title"},
+    "summary": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/properties/summary"},
+    "records": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/properties/records"},
+    "project": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/properties/project"},
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "product",
+          "secondary_products",
+          "tags",
+          "absent_tags",
+          "overlays",
+          "unresolved_overlays",
+          "inapplicable_overlays",
+          "dimensions",
+          "unresolved_dimensions",
+          "inapplicable_dimensions",
+          "template_versions",
+          "confirmed_by"
+        ],
+        "properties": {
+          "product": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/product"
+          },
+          "secondary_products": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/secondary_products"
+          },
+          "tags": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/tags"
+          },
+          "absent_tags": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/absent_tags"
+          },
+          "overlays": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/overlays"
+          },
+          "unresolved_overlays": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/unresolved_overlays"
+          },
+          "inapplicable_overlays": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/inapplicable_overlays"
+          },
+          "dimensions": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/dimensions"
+          },
+          "unresolved_dimensions": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/unresolved_dimensions"
+          },
+          "inapplicable_dimensions": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/inapplicable_dimensions"
+          },
+          "template_versions": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/template_versions"
+          },
+          "confirmed_by": {
+            "$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/profile/properties/confirmed_by"
+          },
+          "readiness_criteria": {"type": "array", "items": {"$ref": "#/$defs/criterion-snapshot"}}
+        }
+      }
+    },
+    "frontier": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/properties/frontier"},
+    "discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claims", "findings", "decision_links", "requirements", "impacts", "attestations", "conditions"],
+      "properties": {
+        "claims": {"type": "array", "items": {"$ref": "#/$defs/claim"}},
+        "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+        "decision_links": {"type": "array", "items": {"$ref": "#/$defs/decision-link"}},
+        "requirements": {"type": "array", "items": {"$ref": "#/$defs/requirement"}},
+        "impacts": {"type": "array", "items": {"$ref": "#/$defs/impact"}},
+        "attestations": {"type": "array", "items": {"$ref": "#/$defs/attestation"}},
+        "conditions": {"type": "array", "items": {"$ref": "#/$defs/condition"}}
+      }
+    }
+  },
+  "$defs": {
+    "criterion-snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criterion", "source", "applicability", "unresolved_tags"],
+      "properties": {
+        "criterion": {"$ref": "https://adp-discovery.local/schemas/template.schema.json#/$defs/criterion"},
+        "source": {"$ref": "#/$defs/id"},
+        "applicability": {"enum": ["applicable", "unresolved", "inapplicable"]},
+        "unresolved_tags": {"$ref": "#/$defs/ids"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"applicability": {"const": "unresolved"}}},
+          "then": {"properties": {"unresolved_tags": {"minItems": 1}}},
+          "else": {"properties": {"unresolved_tags": {"maxItems": 0}}}
+        }
+      ]
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "section", "text", "material", "finding_ids"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "section": {"enum": ["intent", "scope", "stakeholders", "success", "constraints"]},
+        "text": {"$ref": "#/$defs/text"},
+        "material": {"type": "boolean"},
+        "finding_ids": {"$ref": "#/$defs/ids"},
+        "uncertainty": {"$ref": "#/$defs/text"}
+      },
+      "anyOf": [{"properties": {"finding_ids": {"minItems": 1}}}, {"required": ["uncertainty"]}]
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "evidence_ids", "assessment", "rationale"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "text": {"$ref": "#/$defs/text"},
+        "evidence_ids": {"$ref": "#/$defs/ids"},
+        "assessment": {"enum": ["supported", "uncertain", "disputed"]},
+        "rationale": {"$ref": "#/$defs/text"}
+      },
+      "if": {"properties": {"assessment": {"const": "supported"}}},
+      "then": {"properties": {"evidence_ids": {"minItems": 1}}}
+    },
+    "decision-link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "finding_ids"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "finding_ids": {"$ref": "#/$defs/ids"},
+        "superseded_by": {"$ref": "#/$defs/id"}
+      },
+      "anyOf": [{"properties": {"finding_ids": {"minItems": 1}}}, {"required": ["superseded_by"]}]
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "status", "decision_ids", "acceptance_criteria"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "text": {"$ref": "#/$defs/text"},
+        "status": {"enum": ["proposed", "active", "superseded", "withdrawn"]},
+        "decision_ids": {"$ref": "#/$defs/ids"},
+        "justification": {"$ref": "#/$defs/text"},
+        "acceptance_criteria": {"type": "array", "items": {"$ref": "#/$defs/acceptance-criterion"}},
+        "superseded_by": {"$ref": "#/$defs/id"}
+      },
+      "if": {"properties": {"status": {"const": "superseded"}}},
+      "then": {"required": ["superseded_by"]},
+      "else": {"properties": {"superseded_by": false}},
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "withdrawn"}}},
+          "then": {"required": ["justification"]}
+        }
+      ]
+    },
+    "acceptance-criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "outcome"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "outcome": {"$ref": "#/$defs/text"},
+        "conditions": {"$ref": "#/$defs/text"},
+        "method": {"$ref": "#/$defs/text"}
+      }
+    },
+    "impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scope", "requirement_ids"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "scope": {"enum": ["requirements", "project", "unknown"]},
+        "requirement_ids": {"$ref": "#/$defs/ids"},
+        "severity": {"enum": ["critical", "noncritical"]},
+        "disposition": {"$ref": "#/$defs/disposition"}
+      },
+      "if": {"properties": {"scope": {"const": "requirements"}}},
+      "then": {"properties": {"requirement_ids": {"minItems": 1}}},
+      "else": {"properties": {"requirement_ids": {"maxItems": 0}}}
+    },
+    "disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "owner", "rationale", "evidence_ids"],
+      "properties": {
+        "outcome": {"enum": ["accepted", "mitigated", "avoided"]},
+        "owner": {"$ref": "#/$defs/text"},
+        "rationale": {"$ref": "#/$defs/text"},
+        "evidence_ids": {"$ref": "#/$defs/ids", "minItems": 1},
+        "authorization": {"$ref": "#/$defs/authorization"}
+      },
+      "if": {"properties": {"outcome": {"const": "accepted"}}},
+      "then": {"required": ["authorization"]}
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "role", "source"],
+      "properties": {
+        "actor": {"$ref": "#/$defs/text"},
+        "role": {"$ref": "#/$defs/id"},
+        "source": {"$ref": "#/$defs/text"}
+      }
+    },
+    "attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "criterion_id", "subject", "outcome", "actor", "role", "source", "rationale"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "criterion_id": {"$ref": "#/$defs/id"},
+        "subject": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "outcome": {"enum": ["passed", "failed"]},
+        "actor": {"$ref": "#/$defs/text"},
+        "role": {"$ref": "#/$defs/id"},
+        "source": {"$ref": "#/$defs/text"},
+        "rationale": {"$ref": "#/$defs/text"}
+      }
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "criterion_id", "subject", "owner", "completion", "rationale", "authorization"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "criterion_id": {"$ref": "#/$defs/id"},
+        "subject": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "owner": {"$ref": "#/$defs/text"},
+        "completion": {"$ref": "#/$defs/text"},
+        "rationale": {"$ref": "#/$defs/text"},
+        "authorization": {"$ref": "#/$defs/authorization"}
+      }
+    },
+    "id": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/id"},
+    "ids": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/ids"},
+    "text": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/text"}
+  }
+}

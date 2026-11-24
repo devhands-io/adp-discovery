@@ -2,10 +2,11 @@
 
 Use a named workspace or the unique matching `state.json` under `.discovery/`.
 If several workspaces fit, ask which one to use. Investigation can initialize
-a v2 draft from a supplied project brief using `init PATH --project ID --title TITLE`.
+a v3 draft from a supplied project brief using
+`init PATH --project ID --title TITLE --artifacts`.
 Requirements and modeling can work from a draft with sufficient support or
-report the missing inputs. Both saved versions can be read and updated within
-their existing contracts. Upgrading v1 is an explicit operation.
+report missing inputs. Earlier saved versions can be read and updated within
+their existing contracts. Upgrades are explicit operations.
 
 Run commands from the repository root with the project interpreter. Replace
 the sample path and use `.venv\Scripts\python.exe` on Windows.
@@ -17,7 +18,8 @@ the sample path and use `.venv\Scripts\python.exe` on Windows.
 ```
 
 Use the latest `show` output as the complete candidate, including its revision.
-Use the [v2 schema](../schemas/state-v2.schema.json) or the
+Use the [v3 schema](../schemas/state-v3.schema.json),
+[v2 schema](../schemas/state-v2.schema.json), or the
 [v1 schema](../schemas/state.schema.json) for record fields. Preserve existing
 IDs, evidence, decisions, profile history, and the saved question batch.
 Use lowercase kebab-case IDs, ledger record IDs in `refs`, and saved profile
@@ -40,10 +42,17 @@ reconcile the proposed changes by record ID, and recheck the artifact against
 the merged state before retrying. Use the revision returned by a successful
 save, or the revision read for a run without a save.
 
-Write `investigation.md`, `requirements.md`, or `model.md` beside `state.json`,
+For v3, save findings, decision links, requirements, and impacts in the
+`discovery` section and generate the associated artifacts from state.
+Follow the [artifact workflow](discovery-artifacts.md) for review records
+and authorized conditions. Reuse IDs for unchanged findings and obligations.
+Use the latest ledger to check whether earlier findings still apply.
+
+Write `investigation.md` and `requirements.md` for v1 and v2. Write
+`model.md` for conceptual modeling. Save these beside `state.json`,
 identifying the workspace and source revision. Cite ledger IDs for findings,
 obligations, and model relationships. The Markdown files are review artifacts.
 Use the latest ledger to check whether earlier findings still apply and reuse
 any existing requirement IDs for the same obligations. Keep confidence
-assessments, requirement details, and model details in their artifacts. The
-baseline and its readiness report still derive from the saved ledger.
+assessments and requirement details in their v1 and v2 artifacts. The
+model details live in its artifact for all versions.

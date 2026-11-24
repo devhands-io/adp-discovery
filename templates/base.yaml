@@ -1,5 +1,11 @@
 version: 1
 id: general
+readiness_criteria:
+  - id: baseline-review
+    description: The stakeholder reviews the discovery baseline and its supporting evidence.
+    kind: review
+    role: stakeholder
+    on_failure: block
 tags:
   sensitive-data: The product handles sensitive information.
   external-actions: The product can affect systems, people, or assets outside its workspace.

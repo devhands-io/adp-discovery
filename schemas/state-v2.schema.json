@@ -17,9 +17,9 @@
     "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$(?!\\n)"},
     "ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
     "text": {"type": "string", "pattern": "\\S"},
-    "record": {
+    "record": {"$ref": "#/$defs/ledger", "unevaluatedProperties": false},
+    "ledger": {
       "type": "object",
-      "additionalProperties": false,
       "required": ["id", "kind", "status", "text", "dimensions", "refs"],
       "properties": {
         "id": {"$ref": "#/$defs/id"},

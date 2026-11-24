@@ -6,6 +6,7 @@ from pathlib import Path
 
 import yaml
 from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -36,11 +37,21 @@ def read_json(stream):
 
 
 @cache
-def schema(name):
+def schema_document(name):
     path = ROOT / "schemas" / f"{name}.schema.json"
-    document = json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+@cache
+def schema(name):
+    document = schema_document(name)
     Draft202012Validator.check_schema(document)
-    return Draft202012Validator(document)
+    registry = Registry().with_resources(
+        (f"https://adp-discovery.local/schemas/{name}.schema.json",
+         Resource.from_contents(schema_document(name)))
+        for name in ("state-v2", "state-v3", "template")
+    )
+    return Draft202012Validator(document, registry=registry)
 
 
 def validate_schema(name, data, label):
@@ -124,6 +135,15 @@ def check_rule_refs(rule, products, tags, label):
                 check_rule_refs(child, products, tags, f"{label}.{operator}[{index}]")
 
 
+def applicable_entry(entry, template_result, products, tag_values):
+    if "applies" not in entry:
+        return template_result
+    return combine_rule_results(
+        (template_result, evaluate_rule(entry["applies"], products, tag_values)),
+        decisive=False,
+    )
+
+
 class Catalog:
     def __init__(self, directory):
         base_path = directory / "base.yaml"
@@ -147,6 +167,7 @@ class Catalog:
                 paths[path.stem] = path
 
         owners = {}
+        criteria = {}
         for item in (*self.products.values(), *self.overlays.values()):
             path = paths[item["id"]]
             if "applies" in item:
@@ -167,9 +188,27 @@ class Catalog:
                 owners[key] = dimension, location
                 if "applies" in dimension:
                     check_rule_refs(dimension["applies"], self.products, self.tags, f"{location}.applies")
+            local_dimensions = {dimension["id"] for template in (self.base, item)
+                                for dimension in template["dimensions"]}
+            for index, criterion in enumerate(item.get("readiness_criteria", [])):
+                location = f"{path} $.readiness_criteria[{index}]"
+                key = criterion["id"]
+                if key in criteria:
+                    raise DiscoveryError(f"duplicate readiness criterion ID {key!r} in {criteria[key]} and {location}")
+                criteria[key] = location
+                if "applies" in criterion:
+                    check_rule_refs(criterion["applies"], self.products, self.tags, f"{location}.applies")
+                if criterion["kind"] == "dimension" and criterion["dimension"] not in local_dimensions:
+                    raise DiscoveryError(f"{location}: criterion dimension must come from its template or the base")
+                if key == "baseline-review" and (
+                    item is not self.base or criterion["kind"] != "review" or "applies" in criterion
+                ):
+                    raise DiscoveryError(f"{location}: baseline-review must be an unconditional base review")
 
-    def compose(self, product, tags, *, secondary_products=(), partial=False, absent_tags=(), snapshot=False):
+    def compose(self, product, tags, *, secondary_products=(), partial=False, absent_tags=(),
+                snapshot=False, readiness=False):
         """Compose a confirmed checklist or inspect applicability with partial tag facts."""
+        snapshot = snapshot or readiness
         partial = partial or snapshot
         selected = (product, *secondary_products)
         products = set()
@@ -216,6 +255,8 @@ class Catalog:
                 inapplicable_overlays=[], inapplicable_dimensions=[],
                 template_versions={item["id"]: item["version"] for item in templates},
             )
+        if readiness:
+            profile["readiness_criteria"] = []
         for item in templates:
             source = item["id"]
             template_result = (True, set())
@@ -231,13 +272,7 @@ class Catalog:
                 else:
                     profile["inapplicable_overlays"].append(source)
             for dimension in item["dimensions"]:
-                result = template_result
-                if "applies" in dimension:
-                    result = combine_rule_results(
-                        (template_result, evaluate_rule(dimension["applies"], products, tag_values)),
-                        decisive=False,
-                    )
-                value, missing = result
+                value, missing = applicable_entry(dimension, template_result, products, tag_values)
                 entry = {key: dimension[key] for key in ("id", "question", "required")}
                 entry["source"] = source
                 if value is True:
@@ -246,4 +281,11 @@ class Catalog:
                     profile["unresolved_dimensions"].append({**entry, "unresolved_tags": sorted(missing)})
                 elif snapshot:
                     profile["inapplicable_dimensions"].append(entry)
+            if readiness:
+                for criterion in item.get("readiness_criteria", []):
+                    value, missing = applicable_entry(criterion, template_result, products, tag_values)
+                    profile["readiness_criteria"].append({
+                        "criterion": criterion, "source": source, "unresolved_tags": sorted(missing),
+                        "applicability": {True: "applicable", None: "unresolved", False: "inapplicable"}[value],
+                    })
         return profile

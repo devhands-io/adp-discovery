@@ -7,18 +7,19 @@ See the [README](../../../../README.md) and
 ## Start or resume
 
 ```sh
-.venv/bin/python -m src.adp_discovery init .discovery/meeting-notes/state.json --project meeting-notes --title "Meeting notes skill"
+.venv/bin/python -m src.adp_discovery init .discovery/meeting-notes/state.json --project meeting-notes --title "Meeting notes skill" --artifacts
 .venv/bin/python -m src.adp_discovery catalog
 .venv/bin/python -m src.adp_discovery compose --product agent-skill --partial --no-tag external-actions
 .venv/bin/python -m src.adp_discovery show .discovery/meeting-notes/state.json
 .venv/bin/python -m src.adp_discovery report .discovery/meeting-notes/state.json --format json
 ```
 
-Use `show` for the latest revision and the JSON report for coverage, eligible
-question IDs, and the saved frontier. Use the named path or identify a unique
-workspace under `.discovery/` when resuming. A v1 workspace remains readable.
-Run `upgrade PATH --project PROJECT-ID` to use the v2 interview fields in an
-existing workspace.
+Use `show` for the latest revision and saved frontier. The JSON report supplies
+readiness reasons. In v2 it also lists eligible questions. Use the named path
+or identify a unique workspace under `.discovery/` when resuming. Existing
+v1 and v2 workspaces remain readable. Use the
+[artifact migration workflow](../../../../docs/discovery-artifacts.md)
+when the stakeholder requests the full artifact set for an earlier workspace.
 
 ## Save a round
 
@@ -30,10 +31,11 @@ the intended catalog checkout and review unrelated catalog changes before
 including them in an ongoing workspace.
 
 ```sh
-.venv/bin/python -m src.adp_discovery profile --product agent-skill --no-tag external-actions --confirmed-by owner-confirms-type
+.venv/bin/python -m src.adp_discovery profile --product agent-skill --no-tag external-actions --confirmed-by owner-confirms-type --artifacts
 .venv/bin/python -m src.adp_discovery save .discovery/meeting-notes/state.json < candidate.json
 ```
 
+Use `profile --artifacts` for v3 and the plain `profile` command for v2.
 Start from the latest `show` output. Keep its revision, project ID, and existing
 profile snapshots. Update the summary, ledger, and frontier by ID. Save the
 complete candidate through stdin. After a stale revision error, reload, merge
@@ -63,5 +65,7 @@ question to ask next.
 ```
 
 The report distinguishes applicable gaps, unknown applicability, and confirmed
-exclusions. The JSON report includes blocker IDs and the current and eligible
-question IDs. Readiness is preliminary and requires stakeholder review.
+exclusions. For v3, use the [artifact workflow](../../../../docs/discovery-artifacts.md)
+to save structured findings, claims, and reviews before rendering the baseline.
+Only record an approval or deferral authorization from an explicit sourced
+outcome for the reviewed content. V1 and v2 report preliminary coverage.

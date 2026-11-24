@@ -1,5 +1,11 @@
 version: 1
 id: security
+readiness_criteria:
+  - id: information-handling-approval
+    description: The designated authority approves the proposed handling of information and external actions.
+    kind: approval
+    role: handling-authority
+    on_failure: block
 applies:
   any:
     - tag: sensitive-data

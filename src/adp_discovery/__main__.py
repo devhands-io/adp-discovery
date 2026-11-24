@@ -5,7 +5,10 @@ import json
 import sys
 from pathlib import Path
 
+from .artifact_markdown import render as artifact_markdown
+from .artifacts import project_artifacts
 from .core import ROOT, Catalog, read_json
+from .discovery import review_subject
 from .report import markdown, readiness
 from .state import initialize, initialize_draft, load_state, save, upgrade
 
@@ -19,10 +22,12 @@ def parser():
     for name in ("compose", "profile", "init"):
         command = commands.add_parser(name, help={
             "compose": "inspect a composed discovery checklist",
-            "profile": "compose a version 2 profile snapshot with explicit applicability",
+            "profile": "compose a profile snapshot with explicit applicability",
             "init": "create discovery state and save the checklist",
         }[name])
         command.add_argument("--tag", action="append", default=[])
+        if name != "compose":
+            command.add_argument("--artifacts", action="store_true", help="use version 3 artifact and readiness state")
         if name == "init":
             mode = command.add_mutually_exclusive_group(required=True)
             mode.add_argument("--product", help="create a confirmed version 1 workspace")
@@ -40,15 +45,20 @@ def parser():
     for name, help_text in (
         ("show", "load and validate saved state"),
         ("save", "save a complete state document from standard input"),
-        ("upgrade", "explicitly upgrade a version 1 workspace in place"),
-        ("report", "render the discovery baseline and preliminary readiness"),
+        ("upgrade", "explicitly upgrade a saved workspace in place"),
+        ("report", "render the discovery baseline and readiness"),
+        ("artifacts", "generate the seven discovery artifacts from one saved revision"),
+        ("review-subject", "identify the saved content to review or authorize for deferral"),
     ):
         command = commands.add_parser(name, help=help_text)
         command.add_argument("state", type=Path)
         if name == "report":
             command.add_argument("--format", choices=("markdown", "json"), default="markdown")
+        elif name == "artifacts":
+            command.add_argument("--format", choices=("markdown", "json"), default="json")
         elif name == "upgrade":
-            command.add_argument("--project", required=True)
+            command.add_argument("--project", help="project ID for a version 1 workspace")
+            command.add_argument("--to", type=int, choices=(2, 3), default=2)
     return cli
 
 
@@ -58,15 +68,27 @@ def run(options):
     if options.command == "save":
         return save(options.state, read_json(sys.stdin))
     if options.command == "upgrade":
-        return upgrade(options.state, options.project)
+        return upgrade(options.state, options.project, target=options.to)
     if options.command == "report":
         state = load_state(options.state)
+        if state["version"] == 3:
+            bundle = project_artifacts(state)
+            return artifact_markdown(bundle) if options.format == "markdown" else bundle["discovery_readiness_report"]
         return markdown(state) if options.format == "markdown" else readiness(state)
+    if options.command == "artifacts":
+        bundle = project_artifacts(load_state(options.state))
+        return artifact_markdown(bundle) if options.format == "markdown" else bundle
+    if options.command == "review-subject":
+        state = load_state(options.state)
+        if state["version"] != 3:
+            raise ValueError("review subjects require version 3; use upgrade --to 3")
+        return {"review_subject": review_subject(state),
+                "condition_subject": review_subject(state, include_conditions=False)}
 
     if options.command == "init" and options.project is not None:
         if options.tag:
             raise ValueError("record classification tags in a confirmed profile after draft initialization")
-        return initialize_draft(options.state, options.title, options.project)
+        return initialize_draft(options.state, options.title, options.project, artifacts=options.artifacts)
 
     catalog = Catalog(options.templates)
     if options.command == "validate":
@@ -74,12 +96,14 @@ def run(options):
     if options.command == "catalog":
         return {"products": sorted(catalog.products), "tags": catalog.tags}
     if options.command == "init":
+        if options.artifacts:
+            raise ValueError("use --project with --artifacts to initialize a draft")
         profile = catalog.compose(options.product, options.tag)
         return initialize(options.state, options.title, profile)
     if options.command == "profile":
         return {**catalog.compose(
             options.product, options.tag, secondary_products=options.secondary_product,
-            absent_tags=options.no_tag, snapshot=True,
+            absent_tags=options.no_tag, snapshot=True, readiness=options.artifacts,
         ), "confirmed_by": options.confirmed_by}
     return catalog.compose(
         options.product, options.tag,

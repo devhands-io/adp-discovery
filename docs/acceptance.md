@@ -103,3 +103,18 @@ classification. Use a copy of the legacy pilot to check that the supporting
 skills can read v1 without upgrading it automatically.
 For the requirements rerun, include a second confirmed obligation outside the
 conflict, such as producing a local draft without taking external actions.
+
+## Milestone 6 artifacts and readiness
+
+Rebuild the [three example reports](discovery-artifacts.md#migration-and-examples)
+from saved revisions. The automated suite compares their bytes and replays
+the meeting decision register through explicit migration to v3.
+
+| Scenario | Acceptance condition |
+| --- | --- |
+| Single source revision | The seven sections share source identity, profile, and digest. Markdown and JSON resolve the same IDs and use the same status. |
+| Traceable claims and obligations | The evidence-to-acceptance chain resolves to correctly typed entities. Unsupported material claims and requirements block. Superseded history remains traceable. |
+| Incomplete discovery | Required coverage, critical contradictions, critical risks without disposition, and missing or stale mandatory reviews surface as blockers even with an empty batch. |
+| Product and overlay policy | Applicable, excluded, and unknown criteria are visible. An approval has the configured role and current subject. Live catalog edits leave an earlier export reproducible. |
+| Authorized conditions | A conditional result has a current stakeholder-authorized owner, rationale, and completion condition. Missing or stale authorization blocks. |
+| Compatibility | V1 and v2 reports keep their earlier formats. Migration retains records and shows gaps for unavailable findings, criteria, and approvals. |

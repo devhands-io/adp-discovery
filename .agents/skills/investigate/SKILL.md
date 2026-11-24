@@ -21,6 +21,7 @@ to load the workspace and save evidence, gaps, and contradictions.
    and constraints when the question warrants it. Identify missing tests or
    evidence that could change the conclusion.
 4. Save supported observations, material assumptions, evidence gaps, and
-   contradictions. In `investigation.md`, link findings to ledger IDs, explain
-   confidence and its basis, and state what would close each unresolved gap.
-   Leave choices and conflict resolution to the stakeholder.
+   contradictions. In v3, save findings with evidence IDs, an assessment, and
+   its rationale. Link them to affected decisions and render from saved state.
+   In v1 and v2, link findings to ledger IDs in `investigation.md`. Explain
+   what would close each gap. Leave conflict resolution to the stakeholder.

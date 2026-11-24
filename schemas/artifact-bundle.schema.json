@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source",
+    "discovery_brief",
+    "decision_register",
+    "requirements_baseline",
+    "evidence_register",
+    "risk_register",
+    "open_questions",
+    "discovery_readiness_report"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source": {"$ref": "#/$defs/source"},
+    "discovery_brief": {"$ref": "#/$defs/brief"},
+    "decision_register": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decisions"],
+      "properties": {"decisions": {"type": "array", "items": {"$ref": "#/$defs/decision"}}}
+    },
+    "requirements_baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirements"],
+      "properties": {"requirements": {"type": "array", "items": {"$ref": "#/$defs/requirement"}}}
+    },
+    "evidence_register": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence", "findings"],
+      "properties": {
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}}
+      }
+    },
+    "risk_register": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["risks"],
+      "properties": {"risks": {"type": "array", "items": {"$ref": "#/$defs/risk"}}}
+    },
+    "open_questions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["questions", "frontier"],
+      "properties": {
+        "questions": {"type": "array", "items": {"$ref": "#/$defs/question"}},
+        "frontier": {"$ref": "#/$defs/ids"}
+      }
+    },
+    "discovery_readiness_report": {"$ref": "#/$defs/readiness"}
+  },
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "section", "text", "material", "finding_ids", "support_status"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "section": {"enum": ["intent", "scope", "stakeholders", "success", "constraints"]},
+        "text": {"$ref": "#/$defs/text"},
+        "material": {"type": "boolean"},
+        "finding_ids": {"$ref": "#/$defs/ids"},
+        "uncertainty": {"$ref": "#/$defs/text"},
+        "support_status": {"enum": ["supported", "uncertain"]}
+      },
+      "anyOf": [{"properties": {"finding_ids": {"minItems": 1}}}, {"required": ["uncertainty"]}]
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text",
+        "evidence_ids",
+        "assessment",
+        "rationale",
+        "effective_assessment",
+        "disputed_evidence_ids"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "text": {"$ref": "#/$defs/text"},
+        "evidence_ids": {"$ref": "#/$defs/ids"},
+        "assessment": {"enum": ["supported", "uncertain", "disputed"]},
+        "rationale": {"$ref": "#/$defs/text"},
+        "effective_assessment": {"enum": ["supported", "uncertain", "disputed"]},
+        "disputed_evidence_ids": {"$ref": "#/$defs/ids"}
+      },
+      "if": {"properties": {"assessment": {"const": "supported"}}},
+      "then": {"properties": {"evidence_ids": {"minItems": 1}}}
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "status", "decision_ids", "acceptance_criteria", "justification_status"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "text": {"$ref": "#/$defs/text"},
+        "status": {"enum": ["proposed", "active", "superseded", "withdrawn"]},
+        "decision_ids": {"$ref": "#/$defs/ids"},
+        "justification": {"$ref": "#/$defs/text"},
+        "acceptance_criteria": {
+          "type": "array",
+          "items": {
+            "$ref": "https://adp-discovery.local/schemas/state-v3.schema.json#/$defs/acceptance-criterion"
+          }
+        },
+        "superseded_by": {"$ref": "#/$defs/id"},
+        "justification_status": {"enum": ["supported", "uncertain"]}
+      },
+      "if": {"properties": {"status": {"const": "superseded"}}},
+      "then": {"required": ["superseded_by"]},
+      "else": {"properties": {"superseded_by": false}},
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "withdrawn"}}},
+          "then": {"required": ["justification"]}
+        }
+      ]
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "outcome", "reason", "basis", "refs"],
+      "properties": {
+        "code": {"$ref": "#/$defs/id"},
+        "outcome": {"enum": ["pass", "block", "condition", "inform", "excluded"]},
+        "basis": {"enum": ["deterministic", "recorded-assessment", "recorded-review", "recorded-approval"]},
+        "reason": {"$ref": "#/$defs/text"},
+        "refs": {"$ref": "#/$defs/ids"},
+        "criterion_id": {"$ref": "#/$defs/id"},
+        "dimension": {"$ref": "#/$defs/id"},
+        "condition_id": {"$ref": "#/$defs/id"},
+        "source": {"$ref": "#/$defs/id"}
+      }
+    },
+    "brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "classification", "profile", "claims", "assumptions", "preferences"],
+      "properties": {
+        "title": {"$ref": "#/$defs/text"},
+        "classification": {"enum": ["confirmed", "uncertain"]},
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "https://adp-discovery.local/schemas/state-v3.schema.json#/properties/profiles/items"
+            },
+            {"type": "null"}
+          ]
+        },
+        "claims": {"type": "array", "items": {"$ref": "#/$defs/claim"}},
+        "assumptions": {"type": "array", "items": {"$ref": "#/$defs/assumption"}},
+        "preferences": {"type": "array", "items": {"$ref": "#/$defs/preference"}},
+        "draft_intent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text", "uncertainty"],
+          "properties": {"text": {"type": "string"}, "uncertainty": {"$ref": "#/$defs/text"}}
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project", "state_version", "revision", "profile_index", "state_digest"],
+      "properties": {
+        "project": {"$ref": "#/$defs/id"},
+        "state_version": {"const": 3},
+        "revision": {"type": "integer", "minimum": 0},
+        "profile_index": {"anyOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]},
+        "state_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "review_subject",
+        "condition_subject",
+        "checks",
+        "attestations",
+        "conditions",
+        "contradictions"
+      ],
+      "properties": {
+        "status": {"enum": ["ready", "conditionally-ready", "not-ready"]},
+        "review_subject": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "condition_subject": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "checks": {"type": "array", "items": {"$ref": "#/$defs/check"}},
+        "attestations": {
+          "type": "array",
+          "items": {"$ref": "https://adp-discovery.local/schemas/state-v3.schema.json#/$defs/attestation"}
+        },
+        "conditions": {
+          "type": "array",
+          "items": {"$ref": "https://adp-discovery.local/schemas/state-v3.schema.json#/$defs/condition"}
+        },
+        "contradictions": {"type": "array", "items": {"$ref": "#/$defs/contradiction"}}
+      }
+    },
+    "assumption": {
+      "allOf": [
+        {"$ref": "#/$defs/ledger"},
+        {"properties": {"kind": {"const": "assumption"}, "status": {"type": "string"}}, "required": []}
+      ],
+      "unevaluatedProperties": false
+    },
+    "preference": {
+      "allOf": [
+        {"$ref": "#/$defs/ledger"},
+        {"properties": {"kind": {"const": "preference"}, "status": {"type": "string"}}, "required": []}
+      ],
+      "unevaluatedProperties": false
+    },
+    "evidence": {
+      "allOf": [
+        {"$ref": "#/$defs/ledger"},
+        {"properties": {"kind": {"const": "evidence"}, "status": {"type": "string"}}, "required": []}
+      ],
+      "unevaluatedProperties": false
+    },
+    "decision": {
+      "allOf": [
+        {"$ref": "#/$defs/ledger"},
+        {
+          "properties": {
+            "kind": {"const": "decision"},
+            "status": {"type": "string"},
+            "finding_ids": {"$ref": "#/$defs/ids"},
+            "support_status": {"enum": ["supported", "uncertain"]},
+            "superseded_by": {"$ref": "#/$defs/id"}
+          },
+          "required": ["finding_ids", "support_status"]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "risk": {
+      "allOf": [
+        {"$ref": "#/$defs/ledger"},
+        {
+          "properties": {
+            "kind": {"const": "risk"},
+            "status": {"type": "string"},
+            "scope": {"enum": ["requirements", "project", "unknown"]},
+            "requirement_ids": {"$ref": "#/$defs/ids"},
+            "severity": {"enum": ["critical", "noncritical"]},
+            "disposition": {"$ref": "https://adp-discovery.local/schemas/state-v3.schema.json#/$defs/disposition"}
+          },
+          "required": ["scope", "requirement_ids"]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "question": {
+      "allOf": [
+        {"$ref": "#/$defs/ledger"},
+        {
+          "properties": {
+            "kind": {"const": "question"},
+            "status": {"const": "open"},
+            "scope": {"enum": ["requirements", "project", "unknown"]},
+            "requirement_ids": {"$ref": "#/$defs/ids"},
+            "severity": {"enum": ["critical", "noncritical"]}
+          },
+          "required": ["scope", "requirement_ids"]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "contradiction": {
+      "allOf": [
+        {"$ref": "#/$defs/ledger"},
+        {
+          "properties": {
+            "kind": {"const": "contradiction"},
+            "status": {"type": "string"},
+            "scope": {"enum": ["requirements", "project", "unknown"]},
+            "requirement_ids": {"$ref": "#/$defs/ids"},
+            "severity": {"enum": ["critical", "noncritical"]}
+          },
+          "required": ["scope", "requirement_ids"]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ledger": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/ledger"},
+    "id": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/id"},
+    "ids": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/ids"},
+    "text": {"$ref": "https://adp-discovery.local/schemas/state-v2.schema.json#/$defs/text"}
+  }
+}

@@ -4,7 +4,7 @@ from .state import current_profile, eligible_questions
 
 
 def readiness(state):
-    v2 = state["version"] == 2
+    v2 = state["version"] >= 2
     profile = current_profile(state)
     records = {record["id"]: record for record in state["records"]}
     findings = []
@@ -92,7 +92,7 @@ def markdown(state):
             f"- Tags: {', '.join(profile['tags']) or 'none'}",
             f"- Overlays: {', '.join(profile['overlays']) or 'none'}",
         ])
-        if state["version"] == 2:
+        if state["version"] >= 2:
             lines.extend([
                 f"- Secondary products: {', '.join(profile['secondary_products']) or 'none'}",
                 f"- Absent tags: {', '.join(profile['absent_tags']) or 'none recorded'}",
@@ -108,7 +108,7 @@ def markdown(state):
          "No assumptions, risks, or contradictions recorded."),
         ("Evidence", ("evidence",), None, "No evidence recorded."),
     )
-    if state["version"] == 2:
+    if state["version"] >= 2:
         sections += (("Stakeholder preferences", ("preference",), None, "No preferences recorded."),)
     for heading, kinds, status, empty in sections:
         entries = [
@@ -118,7 +118,7 @@ def markdown(state):
         lines.extend(["", f"## {heading}", "", *(entries or [empty])])
 
     lines.extend(["", "## Preliminary readiness", "", f"Status: `{report['status']}`", ""])
-    if state["version"] == 2:
+    if state["version"] >= 2:
         if report["classification"] == "draft":
             explanation = "The product classification is awaiting stakeholder confirmation."
         elif report["status"] == "baseline-ready":
@@ -145,6 +145,6 @@ def markdown(state):
             lines.append(f"- `{key}` is covered by {', '.join(links)}.")
     if report["blockers"]:
         lines.append(f"- Blocking records: {', '.join(report['blockers'])}.")
-    if state["version"] == 2 and state["frontier"]:
+    if state["version"] >= 2 and state["frontier"]:
         lines.append(f"- Current question batch: {', '.join(state['frontier'])}.")
     return "\n".join(lines) + "\n"

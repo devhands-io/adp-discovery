@@ -1,5 +1,11 @@
 version: 1
 id: agent-skill
+readiness_criteria:
+  - id: handoff-replay
+    description: Assess a representative replay of the skill handoff.
+    kind: assessment
+    role: discovery-reviewer
+    on_failure: condition
 dimensions:
   - id: invocation
     question: What should trigger the skill, and when should it ask for clarification?

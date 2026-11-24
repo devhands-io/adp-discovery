@@ -14,8 +14,8 @@ assessment.
 | Skill | When to use it | What it produces |
 | --- | --- | --- |
 | [`interview`](.agents/skills/interview/SKILL.md) | Start discovery, resume a saved interview, or reconcile conflicting stakeholder answers. | A saved discovery workspace with classification, evidence, decisions, and the next question batch. On request, a Markdown baseline for review. |
-| [`investigate`](.agents/skills/investigate/SKILL.md) | Verify a claim, assess feasibility, or compare alternatives. | Sourced evidence and gaps in the workspace, plus `investigation.md`. |
-| [`define-requirements`](.agents/skills/define-requirements/SKILL.md) | Translate confirmed findings into verifiable requirements. | `requirements.md` with stable IDs, source links, and acceptance criteria or gaps. |
+| [`investigate`](.agents/skills/investigate/SKILL.md) | Verify a claim, assess feasibility, or compare alternatives. | Evidence, findings, and gaps with source links. |
+| [`define-requirements`](.agents/skills/define-requirements/SKILL.md) | Translate confirmed findings into verifiable requirements. | Requirements with stable IDs, source links, and acceptance criteria or gaps. |
 | [`model-product`](.agents/skills/model-product/SKILL.md) | Clarify a structure, relationship, workflow, or responsibility. | An optional `model.md` grounded in discovery evidence and decisions. |
 
 Invoke any supporting skill directly in Codex and name the workspace. For example:
@@ -193,7 +193,7 @@ To start a new draft from the CLI, run `init` once. If you already started the
 sample interview above, use its saved state with `show` and `report`.
 
 ```sh
-.venv/bin/python -m src.adp_discovery init .discovery/meeting-decisions/state.json --project meeting-decisions --title "Meeting decisions"
+.venv/bin/python -m src.adp_discovery init .discovery/meeting-decisions/state.json --project meeting-decisions --title "Meeting decisions" --artifacts
 ```
 
 ```sh
@@ -209,8 +209,11 @@ sample interview above, use its saved state with `show` and `report`.
 # Export a Markdown baseline from the saved state.
 .venv/bin/python -m src.adp_discovery report .discovery/meeting-decisions/state.json > .discovery/meeting-decisions/baseline.md
 
-# Print readiness findings, blockers, and the question batch as JSON.
+# Print readiness findings and blockers as JSON.
 .venv/bin/python -m src.adp_discovery report .discovery/meeting-decisions/state.json --format json
+
+# Export the seven canonical artifacts as one JSON bundle.
+.venv/bin/python -m src.adp_discovery artifacts .discovery/meeting-decisions/state.json
 ```
 
 The example composition applies Evaluation and shows Security as unresolved
@@ -224,6 +227,8 @@ Working state and exports placed in `.discovery/` are local and Git-ignored.
 The v2 JSON report contains readiness findings, blocking record IDs, and both
 the current question batch and eligible question IDs. Existing v1 workspace
 files can still be read. Use `upgrade PATH --project ID` to adopt v2 in place.
+See [Discovery artifacts and readiness](docs/discovery-artifacts.md) for the
+v3 workflow, migration, and reproducible examples.
 
 ## Included pilots
 

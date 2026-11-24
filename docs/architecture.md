@@ -8,7 +8,7 @@
 | Catalog | Product-neutral and domain-specific dimensions, tag definitions, and applicability rules |
 | Python commands | Schema validation, rule evaluation, ordered composition, state integrity, and preliminary evidence coverage |
 | Workspace state | Checklist snapshot, discovery summary, and traceable working records |
-| Generated baseline | A reviewable view of the saved revision, including decisions, gaps, and readiness |
+| Generated artifacts | The canonical JSON bundle and Markdown review of one saved revision |
 | Stakeholders | Confirmation of decisions, evaluation of evidence quality, and approval of the baseline |
 
 The product type describes what is being discovered. The base template also
@@ -79,6 +79,11 @@ false results and the versions of the selected and inspected templates for
 a v2 snapshot. Templates for unselected product types are outside that
 snapshot. `init --product` retains the v1 behavior.
 
+Templates can also declare readiness criteria. They have globally unique
+IDs and follow the same applicability rules as dimensions. V3 profiles
+pin the composed definitions, source template, and known or unresolved
+applicability. See the [criterion contract](discovery-artifacts.md#catalog-criteria-and-readiness-outcomes).
+
 ## State contract
 
 Version 2 starts with `init --project`. The stable project ID, title, intent
@@ -113,10 +118,17 @@ preserves the checklist and ledger, increments the revision, and records
 unknown template versions as `null`. It has no source for past classification
 confirmation IDs or excluded dimensions, so those entries remain empty.
 
+Version 3 uses `init --project ID --artifacts` for new workspaces and
+`upgrade --to 3` for earlier ones. It retains the existing ledger and adds
+structured brief claims, findings, requirements, impacts, conditions, and
+attestations. The same save protects revision, profile, evidence, and
+decision history. Upgraded profiles retain their existing provenance.
+A new confirmed profile produced by `profile --artifacts` pins criteria.
+
 ## Readiness contract
 
-A required dimension is covered by a confirmed decision that links to at
-least one evidence record for that dimension. Every uncovered required
+In the v1 and v2 preliminary report, a required dimension is covered by a
+confirmed decision that links to evidence for that dimension. Every uncovered required
 dimension names its missing support. An open contradiction, reopened
 decision, or open blocking question or risk prevents baseline readiness.
 V2 reports optional dimensions, exclusions, and unknown applicability
@@ -126,10 +138,18 @@ confirmed exclusions, and nonblocking gaps remain available for review.
 Stakeholders evaluate the substance and sufficiency of the evidence and
 approve the baseline independently of the question frontier.
 
-The Markdown export is a point-in-time review of one state revision. JSON
-report output gives machine-readable preliminary readiness findings.
+The v1 and v2 Markdown exports are point-in-time reviews of one state revision.
+Their JSON report output gives machine-readable preliminary readiness findings.
 The v2 Markdown report explains the computed status and identifies stakeholder
 approval as a separate step.
+
+V3 adds a readiness gate with `ready`, `conditionally-ready`, and `not-ready`
+outcomes. Python checks references, status and scope, and binds recorded
+judgments to the reviewed content. Stakeholders confirm decisions and
+provide required reviews and approvals. Agents assess evidence quality,
+materiality, and justification. Each artifact references the same source
+revision, and Markdown renders the JSON bundle. The [artifact contract](discovery-artifacts.md)
+defines the schemas, policy, and workflow.
 
 ## Supporting skills
 
@@ -139,8 +159,8 @@ evidence, gaps, and contradictions. Supporting skills preserve the interview
 frontier. An open contradiction against a confirmed decision reopens that
 decision in the same save. The stakeholder settles what governs.
 
-Skill outputs are separate Markdown artifacts tied to the workspace revision
-and ledger IDs. Investigation records confidence and its basis. Requirements
-retain stable IDs for unchanged obligations and cite their discovery sources.
-Modeling uses a representation suited to the product and can be skipped.
+In v3, Investigation and Requirements save structured findings and obligations.
+The artifact bundle renders them with confidence rationale and trace links.
+Earlier workspaces use revision-linked Markdown outputs. Modeling uses a
+representation suited to the product and can be skipped.
 See the [workspace and artifact contract](supporting-skills.md).

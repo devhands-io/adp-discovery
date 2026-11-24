@@ -19,11 +19,13 @@
 | Explain readiness in v2 Markdown | A short explanation helps stakeholders interpret the status at a glance. The status values and JSON output remain compatible. |
 | Keep pilot evaluation outside the interview | Maintainers agree on the rubric and get approval for the live session before opening a dialog. Stakeholders answer only the product questions. |
 | Run supporting skills independently against the same ledger | A project can investigate, derive requirements, or model where it needs help. Revision-linked Markdown holds the derived details and permits review with the existing state schemas. |
+| Introduce v3 state and a single canonical seven-artifact bundle | Findings and requirements become persistent, typed inputs to traceability and readiness. V1 and v2 keep their report contracts. Markdown renders the same bundle in v3. |
+| Pin readiness policy to the saved profile | Catalog criteria reuse three-valued applicability. New catalog policy takes effect through a confirmed profile snapshot, and earlier exports remain reproducible. |
+| Compute the gate from deterministic checks and sourced judgments | The core can verify links and apply policy. Explicit assessments, reviews, and authorized deferrals are tied to their reviewed content and retained in order. |
 
 ## Subsequent slices
 
-1. Establish the full artifact set and deeper evidence and readiness checks.
-2. Add specialized building, process, and contract templates with distinct
+1. Add specialized building, process, and contract templates with distinct
    discovery pilots.
-3. Expand the catalog in reviewed batches and introduce migrations when the
+2. Expand the catalog in reviewed batches and introduce migrations when the
    contracts change.

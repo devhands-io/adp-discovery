@@ -5,8 +5,9 @@ description: Derive traceable product requirements and verifiable acceptance cri
 
 # Define requirements
 
-Load the [shared discovery workspace](../../../docs/supporting-skills.md) and
-read any existing `requirements.md` before assigning IDs.
+Load the [shared discovery workspace](../../../docs/supporting-skills.md).
+Read the saved requirements in v3 or the existing `requirements.md` in
+v1 and v2 before assigning IDs.
 
 1. Derive requirements from confirmed decisions and verified findings that
    establish an applicable obligation. Cite the supporting decision and
@@ -23,7 +24,10 @@ read any existing `requirements.md` before assigning IDs.
    confirmed trigger and level of obligation. If sources differ on whether a
    behavior is required or permitted, flag the difference and identify what
    can still be verified. Leave unconfirmed targets and design choices open.
-4. Save newly identified gaps and contradictions in the ledger. In
-   `requirements.md`, include each ID, statement, source IDs, and acceptance
-   criteria or verification gap. Flag items whose sources have been reopened,
-   superseded, or called into question and link the record that explains why.
+4. Save gaps and contradictions in the ledger. In v3, save requirements and
+   their stable acceptance criterion IDs in `discovery.requirements`. Link
+   active obligations to confirmed decisions and those decisions to supported
+   findings. Record known requirement impacts on questions and risks. Generate
+   the baseline from the saved revision, which flags stale or weak support.
+   In v1 and v2, record each ID, obligation, sources, and verification gap or
+   acceptance criteria in `requirements.md`.

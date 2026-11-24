@@ -65,3 +65,9 @@ and blockers. A dimension can have evidence while still lacking confirmation
 for readiness. Review whether the evidence is sufficient and who approves
 the baseline. Generate a Markdown baseline on request or at a review
 checkpoint. Leave ADRs out of exploratory questioning.
+
+For v3, save material brief claims with supporting findings or explicit
+uncertainty, and link confirmed decisions to their findings. Use the saved
+criteria to identify who needs to review, approve, or authorize a condition.
+Record the explicit outcome and source for the reviewed subject. Readiness
+requires the recorded baseline review and any applicable approvals.

@@ -167,10 +167,19 @@ sample interview above, use its saved state with `show` and `report`.
 ```
 
 ```sh
+# List the product types and tags available in the catalog.
 .venv/bin/python -m src.adp_discovery catalog
+
+# Preview the agent-skill checklist with sensitive data ruled out and other tags left unknown.
 .venv/bin/python -m src.adp_discovery compose --product agent-skill --partial --no-tag sensitive-data
+
+# Display the saved interview state.
 .venv/bin/python -m src.adp_discovery show .discovery/meeting-decisions/state.json
+
+# Export a Markdown baseline from the saved state.
 .venv/bin/python -m src.adp_discovery report .discovery/meeting-decisions/state.json > .discovery/meeting-decisions/baseline.md
+
+# Print readiness findings, blockers, and the question batch as JSON.
 .venv/bin/python -m src.adp_discovery report .discovery/meeting-decisions/state.json --format json
 ```
 

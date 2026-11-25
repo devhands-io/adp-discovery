@@ -15,31 +15,19 @@ assessment.
 | --- | --- | --- |
 | [`interview`](.agents/skills/interview/SKILL.md) | Start discovery, resume a saved interview, or reconcile conflicting stakeholder answers. | A saved discovery workspace with classification, evidence, decisions, and the next question batch. On request, a Markdown baseline for review. |
 | [`investigate`](.agents/skills/investigate/SKILL.md) | Verify a claim, assess feasibility, or compare alternatives. | Evidence, findings, and gaps with source links. |
-| [`define-requirements`](.agents/skills/define-requirements/SKILL.md) | Translate confirmed findings into verifiable requirements. | Requirements with stable IDs, source links, and acceptance criteria or gaps. |
+| [`define-requirements`](.agents/skills/define-requirements/SKILL.md) | Turn confirmed decisions and supporting evidence into verifiable requirements. | Requirements with stable IDs, source links, and acceptance criteria or gaps. |
 | [`model-product`](.agents/skills/model-product/SKILL.md) | Clarify a structure, relationship, workflow, or responsibility. | An optional `model.md` grounded in discovery evidence and decisions. |
-
-Invoke any supporting skill directly in Codex and name the workspace. For example:
-
-> $investigate Check which records policy applies to missing owners in
-> `.discovery/meeting-decisions/state.json`.
-
-> $define-requirements Derive requirements from
-> `.discovery/meeting-decisions/state.json` and flag missing decisions.
-
-> $model-product Check whether a space adjacency model would help with
-> `.discovery/community-center/state.json`.
 
 The skills share the [workspace and artifact conventions](docs/supporting-skills.md).
 
-## Try the interview skill
+## Try a discovery flow
 
-Already have the project and a Python environment with its dependencies?
-Jump to [Start a sample interview](#2-start-a-sample-interview). You can send
-the prompt as soon as the agent has the project open. The Python dependencies
-are needed when the skill runs commands to load the checklist, save progress,
-or export a baseline.
+Use the four skills to discover a meeting decision register. Each follow-up
+prompt names the same workspace, so you can continue in a fresh chat.
+If you already have the project and its Python dependencies, jump to
+[the walkthrough](#walkthrough).
 
-### 1. Get the project and set up Python once
+### Set up the project
 
 **Download ZIP.** [Download the ZIP from GitHub](https://github.com/devhands-io/adp-discovery/archive/refs/heads/main.zip),
 unzip it, and open a terminal in the extracted `adp-discovery-main` folder.
@@ -52,7 +40,7 @@ git clone https://github.com/devhands-io/adp-discovery.git
 cd adp-discovery
 ```
 
-Both options include the skill, templates, and Python code. If you need to set
+Both options include the skills, templates, and Python code. If you need to set
 up Python for this project, run the commands for your system from the project
 folder with Python 3.10 or newer. A virtual environment is recommended to keep
 dependencies isolated. If the agent can already use a Python environment with
@@ -92,92 +80,100 @@ py -m venv .venv
 
 The optional check prints `Catalog valid.` when it succeeds.
 
-### 2. Start a sample interview
+### Walkthrough
 
 Open the project folder in your agent app or launch its CLI from that folder.
-Use the prompt for your agent, or swap in an idea of your own.
+The prompts use Codex syntax. See [how to invoke the skills](#invoke-the-skills)
+for other hosts.
 
-#### Codex
-
-Codex discovers the interview skill in `.agents/skills/`. Mention `$interview`
-in your prompt. [Codex skills documentation](https://learn.chatgpt.com/docs/build-skills)
+#### 1. Start with `interview`
 
 > $interview Help me discover a skill that turns meeting notes into a decision
 > register. Save progress under `.discovery/meeting-decisions/`.
 
-#### Claude Code
+Confirm or correct the proposed product type and share what you know about
+which tags apply. For this example, tell the agent the project team needs to
+capture each decision and its owner. To try the conflict in step 2, start by
+allowing inferred owners with a tentative label. Answer in the host's question
+dialog when available, or in chat. The interview saves progress to
+`.discovery/meeting-decisions/state.json`.
 
-Type `/interview` in Claude Code to start the project skill.
-[Claude Code skills documentation](https://code.claude.com/docs/en/skills#skills-locations)
+#### 2. Check the evidence with `investigate`
 
-> /interview Help me discover a skill that turns meeting notes into a decision
-> register. Save progress under `.discovery/meeting-decisions/`.
+> $investigate In `.discovery/meeting-decisions/state.json`, check what the
+> register may show when the notes omit an owner. Use the sample records
+> policy in the `owner-policy` record of `examples/meeting-notes/rounds.json`
+> and record any conflict with the current decision.
 
-#### OpenCode
+Investigation records the sourced finding and any conflict. If the policy
+conflicts with a decision, resume the interview to settle it with the
+stakeholder. In the sample, the stakeholder confirms the policy applies and
+chooses `unassigned` when the notes omit the owner.
 
-OpenCode discovers project skills in `.agents/skills/`. Mention `@interview`
-in your prompt. [OpenCode skills documentation](https://opencode.ai/docs/skills/)
+> $interview Resume `.discovery/meeting-decisions/state.json` and ask me to
+> resolve any conflict about missing owners.
 
-> @interview Help me discover a skill that turns meeting notes into a decision
-> register. Save progress under `.discovery/meeting-decisions/`.
+#### 3. Clarify a handoff with `model-product` (optional)
 
-#### During the interview
+> $model-product For `.discovery/meeting-decisions/state.json`, check whether
+> mapping who drafts the register, reviews it, and resolves unassigned
+> entries would clarify responsibilities.
 
-The skill saves a draft before classification. Confirm or correct the proposed
-product type and share what you know about the tags. For the sample, you could
-say that the register is for the project team and should capture each decision
-and its owner. Say when you’re unsure about something. The skill saves progress in
-`.discovery/meeting-decisions/state.json` as you go.
+If a map helps, the skill saves it as `model.md` beside the workspace state.
+Bring any unresolved responsibilities back to the interview.
 
-Answer in the host's built-in question dialog when it is available. In sessions
-without one, the agent asks in chat.
+#### 4. Derive requirements with `define-requirements`
 
-### 3. Resume and export
+> $define-requirements From `.discovery/meeting-decisions/state.json`, derive
+> requirements and observable acceptance criteria from the confirmed decisions
+> and supporting evidence. Flag any gaps.
 
-Start a fresh chat in the same folder and use the same skill invocation.
+For the confirmed sample rule, an acceptance check is that a decision with
+no named owner appears in the register as `unassigned`.
 
-**Codex**
+#### 5. Export and review the baseline
 
-> $interview Resume `.discovery/meeting-decisions/state.json` and continue with
-> the saved questions. If none are queued, review the remaining gaps.
+> Export the discovery baseline from `.discovery/meeting-decisions/state.json`
+> to `.discovery/meeting-decisions/baseline.md`. Summarize the confirmed
+> decisions, requirements, and remaining blockers for stakeholder review.
 
-**Claude Code**
+Send this as a plain request whenever you want a review copy of the saved
+workspace. Open the baseline and check that the brief reflects your intent,
+the requirements trace back to confirmed decisions, and the remaining
+questions and blockers are visible. To answer those questions or revisit
+a decision, resume `$interview` with the workspace path.
 
-> /interview Resume `.discovery/meeting-decisions/state.json` and continue with
-> the saved questions. If none are queued, review the remaining gaps.
+You can also start with `investigate` when you have a project brief and a
+question that needs evidence. Use `model-product` whenever a relationship or
+handoff needs clarification. New evidence or open questions can send you
+back to an earlier step.
 
-**OpenCode**
+### Invoke the skills
 
-> @interview Resume `.discovery/meeting-decisions/state.json` and continue with
-> the saved questions. If none are queued, review the remaining gaps.
+- **Codex** uses `$skill-name` for the skills in `.agents/skills/`.
+  [Codex skills documentation](https://learn.chatgpt.com/docs/build-skills)
+- **OpenCode** uses `@skill-name` for project skills in `.agents/skills/`.
+  [OpenCode skills documentation](https://opencode.ai/docs/skills/)
+- **Claude Code** has a bundled `/interview` entry point. For the other
+  skills, use the file-based prompt below.
+  [Claude Code skills documentation](https://code.claude.com/docs/en/skills#skills-locations)
 
-Then ask for a baseline, even if the interview is still in progress.
+If your host needs a file-based prompt, use the path from the
+[skills table](#skills) in place of the skill mention. For example:
 
-> Export the baseline for .discovery/meeting-decisions/state.json to
-> .discovery/meeting-decisions/baseline.md and summarize the blockers.
+> Read and follow `.agents/skills/investigate/SKILL.md`. Check the sample
+> records policy for the workspace at `.discovery/meeting-decisions/state.json`.
 
-Open `.discovery/meeting-decisions/baseline.md` and check whether the brief
-reflects your idea, the decisions match what you confirmed, and open questions
-and blockers are easy to find.
+### Share feedback
 
-#### If your agent doesn't recognize the skill
-
-Check that the agent has the project folder open, then paste this prompt.
-
-> Read and follow `.agents/skills/interview/SKILL.md`. Help me discover a
-> skill that turns meeting notes into a decision register. Save progress under
-> `.discovery/meeting-decisions/`.
-
-To resume, use the same first sentence followed by the resume request above.
-
-### 4. Share feedback
-
-Reply to whoever invited you to try the skill. A few bullets are enough.
+Reply to whoever invited you to try the walkthrough. A few bullets are enough.
 
 - **Setup and resume** — Where did you get stuck, if anywhere? Did the new chat
   pick up the decisions you had already made?
 - **Interview** — Which question helped you make a decision? Which felt
   repetitive, unclear, or missing?
+- **Skill handoffs** — Did each skill pick up the evidence and decisions it
+  needed from the saved workspace?
 - **Baseline** — What did it capture accurately? What did it miss or treat as
   settled too early?
 
@@ -190,7 +186,7 @@ Run these commands from the project folder. On Windows PowerShell, use
 `.\.venv\Scripts\python.exe` in place of `.venv/bin/python`.
 
 To start a new draft from the CLI, run `init` once. If you already started the
-sample interview above, use its saved state with `show` and `report`.
+walkthrough above, use its saved state with `show` and `report`.
 
 ```sh
 .venv/bin/python -m src.adp_discovery init .discovery/meeting-decisions/state.json --project meeting-decisions --title "Meeting decisions" --artifacts

@@ -9,6 +9,13 @@ Load the [shared discovery workspace](../../../docs/supporting-skills.md) and
 identify the decision, dependency, or ambiguity a model could clarify. If a
 model adds no value, explain why and skip creating a model.
 
+For a screen-based walkthrough, follow the [interaction-model interview and
+viewer workflow](../../../docs/interaction-model.md). Use the interview skill's
+stakeholder dialog conventions. Deliver the portable `interaction-model.md`
+for this branch.
+
+For other conceptual models:
+
 1. Choose a representation suited to the product and question. A space
    adjacency table can expose physical layout constraints. A responsibility
    map can clarify authority in an organization. A workflow can reveal

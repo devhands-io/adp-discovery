@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>$title</title>
+<style>
+[hidden] { display: none !important }
+* { box-sizing: border-box }
+body { margin: 0; color: black; background: white; font: 1rem/1.55 Inter, system-ui, sans-serif }
+main { max-width: 44rem; margin: 8vh auto; padding: 0 1.5rem }
+section { display: none }
+section:target, main:not(:has(section:target)) > #$default_page { display: block }
+h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.12; border-top: .3rem solid; padding-top: 1rem }
+h2 { margin-top: 2rem }
+a { color: inherit; text-underline-offset: .2em }
+nav { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0 }
+.action-row { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid; padding: .6rem 0 }
+nav a { border: 1px solid; padding: .45rem 1.1rem; text-decoration: none }
+nav a:focus-visible, nav a:hover { background: black; color: white }
+fieldset, input { border: 1px solid black; padding: .65rem }
+input { display: block; width: 100%; font: inherit; color: black; background: white }
+.scenario { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-top: 1px solid; padding: 1rem 0 }
+.scenario h3 { margin: 0; font-size: 1.1rem }
+.start { background: black; color: white; padding: .5rem 1rem; text-decoration: none }
+.status { font-size: .9rem }
+#next-scenario { display: block; margin-top: .65rem; font: inherit; cursor: pointer }
+details { margin-top: 2rem }
+summary { cursor: pointer; text-decoration: underline }
+#guide { border-left: 4px solid; padding: .25rem 1rem; margin-bottom: 2rem }
+#guide p { margin: .3rem 0 }
+.scenario-notes, #screen-notes { margin: 0 0 1rem }
+.note-fields label { display: block; margin: .6rem 0 }
+textarea { width: 100%; min-height: 4rem; font: inherit; padding: .5rem; resize: vertical }
+#copy-notes { font: inherit; padding: .45rem 1rem; cursor: pointer }
+footer { margin-top: 3rem; border-top: 1px solid; padding-top: .75rem }
+</style></head><body><main data-default="$default_page" data-model="$model_key" data-revision="$revision"><aside id="guide" hidden aria-live="polite"><strong></strong><p></p><small>Use Notes to flag anything you would change.</small><details id="screen-notes" hidden><summary>Notes</summary><div class="note-fields"></div></details><button id="next-scenario" class="start" hidden>Start next scenario</button></aside>$pages</main>$behavior</body></html>

@@ -9,6 +9,7 @@ from .artifact_markdown import render as artifact_markdown
 from .artifacts import project_artifacts
 from .core import ROOT, Catalog, read_json
 from .discovery import review_subject
+from .interaction import render as render_interaction
 from .report import markdown, readiness
 from .state import initialize, initialize_draft, load_state, save, upgrade
 
@@ -61,10 +62,16 @@ def parser():
         elif name == "upgrade":
             command.add_argument("--project", help="project ID for a version 1 workspace")
             command.add_argument("--to", type=int, choices=(2, 3), default=2)
+    preview = commands.add_parser("interaction-view", help="render a portable Markdown walkthrough")
+    preview.add_argument("model", type=Path)
+    preview.add_argument("output", type=Path)
+    preview.add_argument("--start", help="open the changed screen for a retry")
     return cli
 
 
 def run(options):
+    if options.command == "interaction-view":
+        return render_interaction(options.model, options.output, options.start)
     if options.command == "show":
         return load_state(options.state)
     if options.command == "save":

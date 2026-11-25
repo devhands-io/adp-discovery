@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "scope": {
+      "$ref": "#/$defs/text"
+    },
+    "scenarios": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/scenario"
+      }
+    },
+    "screens": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/screen"
+      }
+    }
+  },
+  "required": [
+    "scope",
+    "scenarios",
+    "screens"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "text": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+    },
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/text"
+        },
+        "start": {
+          "$ref": "#/$defs/id"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "capability",
+        "start",
+        "steps"
+      ],
+      "additionalProperties": false
+    },
+    "screen": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/element"
+          },
+          "minItems": 0
+        },
+        "actions": {
+          "type": "object",
+          "minProperties": 0,
+          "propertyNames": {
+            "$ref": "#/$defs/id"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/action"
+          }
+        }
+      },
+      "required": [
+        "title",
+        "elements",
+        "actions"
+      ],
+      "additionalProperties": false
+    },
+    "action": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "go": {
+          "$ref": "#/$defs/id"
+        },
+        "row": {
+          "$ref": "#/$defs/text"
+        },
+        "bind": {
+          "$ref": "#/$defs/id"
+        },
+        "commit": {
+          "type": "boolean"
+        },
+        "reveal": {
+          "$ref": "#/$defs/id"
+        },
+        "visibleAfter": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "label",
+        "go"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "bind": [
+          "row"
+        ]
+      }
+    },
+    "element": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/paragraph"
+        },
+        {
+          "$ref": "#/$defs/form"
+        }
+      ]
+    },
+    "paragraph": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "text"
+        },
+        "value": {
+          "$ref": "#/$defs/text"
+        },
+        "bind": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "form": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "form"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "type",
+        "label",
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+    "field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "text-field"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "example": {
+          "$ref": "#/$defs/text"
+        },
+        "bind": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "type",
+        "label",
+        "example"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

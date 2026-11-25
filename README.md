@@ -250,3 +250,5 @@ For more detail, see the [interview workflow reference](.agents/skills/interview
 Run the Python tests with `python -m unittest discover -s tests -v`. Use the
 [live acceptance scenarios](docs/acceptance.md#stakeholder-question-delivery)
 to verify dialog behavior in your agent host.
+
+For a clickable screen walkthrough, use the [single-person interaction-model workflow](docs/interaction-model.md) and [meeting decision pilot](examples/interaction-model/pilot.md).

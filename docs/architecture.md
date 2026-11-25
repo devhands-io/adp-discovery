@@ -203,3 +203,23 @@ past snapshots or evidence links to substitute a new ID. V1 keeps its original
 checklist. In v2 and v3, adopt changed definitions by appending a confirmed
 profile. State format changes use the explicit upgrade command. Unsupported
 template formats fail validation before a catalog-based initialization writes state.
+
+### Interaction-model pilot
+
+The optional screen walkthrough uses a Markdown artifact with one YAML model. The Python viewer validates the declared graph, traces intended scenario steps and emits local HTML with fragment links. Review and confirmation stay in the single-modeler conversation. A SHA-256 digest identifies the reviewed Markdown revision in ledger evidence. The viewer reads no workspace state. See the [workflow and format](interaction-model.md).
+
+The interview establishes a scoped scenario inventory before screen design. Stable scenario IDs connect the modeler's intended outcomes to the coverage review. Unmapped scenarios remain visible as gaps in the Markdown.
+
+An action may include a `row` containing its item's display text. The viewer pairs the text with that action and includes the item in its accessible name and coverage trace.
+
+A text field may bind to a stable value ID using `bind`. Matching paragraph and row bindings display its value. A navigation action with `commit: true` saves its screen's bound inputs within the current walkthrough. Other navigation discards drafts. Rendering embeds the editing behavior in the preview.
+
+The viewer opens with task selection and expandable coverage. During a guided replay the browser history entry carries the scenario and current step. The viewer resolves each prompt against the current screen's actions. Missing steps and alternate routes remain available for discussion.
+
+Actions can declare a named event with `reveal`. An action with the matching `visibleAfter` becomes available once that event occurs in the open preview. All roles in that preview see the updated example.
+
+Scenario progress is browser-local and keyed by model source path, scenario ID and route signature. Signatures cover the scenario, traversed actions, and involved screen content. An interrupted run records its last guided step and visibility events. Example field values keep their existing reload behavior. Progress storage is optional; the current visit works in memory when browser storage is unavailable.
+
+Viewer feedback is browser-local and keyed by model revision, scenario, and optional screen and guided step. Scenario notes and screen notes can be edited from the scenario list. Copy notes exports the nonempty entries in scenario order with their references and the reviewed revision.
+
+Interaction modeling reviews the conceptual data model after scenario agreement when the scenarios depend on information. Relevant facts and relationships are traced to the scenarios and screens that use them.

@@ -148,3 +148,21 @@ Use the [release checklist](releases.md) and the following fictional guide scena
 | Model product | Given separately owned publication and correction steps, represent their handoff and cite ledger IDs. If all ownership is already clear and no model helps, record the reason to skip it. |
 
 To exercise independent composition, add a facility as a secondary product only when physical work is also in scope. Both products then share one Accessibility question. A process-only profile excludes that overlay; an unknown barrier in a guide remains unresolved. A facility's circulation question remains under facility ownership.
+
+The [single-person interaction-model pilot](../examples/interaction-model/pilot.md) exercises chat corrections, omission review, version-specific confirmation and replay from a standalone Markdown copy.
+
+With two proposed decisions, each row has a Review action. Selecting either row opens its own populated form. Save displays the selected decision's details, and Return to list displays both rows again.
+
+Edit the second decision title and select Save. Its details, list row and reopened form must show the new title. Edit again and select Back. Reopening must show the last saved title. The first decision retains its original title throughout.
+
+Start a named task, follow the single visible instruction, and reach end-of-task feedback. When two rows offer the same action, the instruction identifies the row. Missing actions and alternate routes must not report success. Browser Back restores the prior instruction.
+
+In the news blog example, the third story is absent before publication. Publishing an authored title reveals it on all three role-specific indexes. Visitors read it, its author can edit it, and a special editor can edit it.
+
+Complete one scenario and leave another partway through. Reopen the walkthrough in the same browser and verify the completed count, Replay, and Resume at the saved step. After changing a single scenario route, verify Retry needed on that scenario and preserved status on unaffected scenarios. Following a different route must not grant completion.
+
+Enter a scenario note and notes on two guided screens, return to the list, reload, and copy. Verify that each appears once with the correct scenario, screen and step, and that blank or deleted notes are omitted. Verify manual selection when clipboard access is declined.
+
+Each scenario has the same one-based number in the list, its on-screen guide, and its exported notes. Numbers follow the order in the Markdown model.
+
+After agreeing the blog scenarios, review the article and author model with the modeler. Keep proposals pending until explicitly accepted. During screen review, removing the agreed publication date from the reader’s article must surface a coverage gap even when every navigation step still works. For a scenario without meaningful domain data, record the reason for skipping this review.

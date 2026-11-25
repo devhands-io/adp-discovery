@@ -1,0 +1,9 @@
+version: 1
+id: reference-guide
+dimensions:
+  - id: guide-source-authority
+    question: Which sources govern each subject, and who resolves conflicting editions?
+    required: true
+  - id: guide-correction-cycle
+    question: Who owns corrections, what signals that guidance is stale, and how do readers learn of a change?
+    required: true

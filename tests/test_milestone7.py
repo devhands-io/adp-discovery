@@ -34,9 +34,9 @@ class ProductValidationTests(unittest.TestCase):
 
     def test_complete_workflow_and_distinct_readiness(self):
         expected = {
-            "facility": ("facility-approval-path", "facility-design-handoff-review", [], (10, 0, 5)),
-            "process": ("process-handoff-evidence", "process-controls-review", ["evaluation", "security"], (14, 0, 0)),
-            "contract": ("contract-delegation-evidence", "contract-material-legal-review", ["security"], (13, 0, 2)),
+            "facility": ("facility-approval-path", "facility-design-handoff-review", ["accessibility"], (11, 0, 5)),
+            "process": ("process-handoff-evidence", "process-controls-review", ["evaluation", "security"], (14, 0, 1)),
+            "contract": ("contract-delegation-evidence", "contract-material-legal-review", ["security"], (13, 0, 3)),
         }
         with tempfile.TemporaryDirectory() as directory:
             for product in PRODUCTS:
@@ -139,7 +139,7 @@ class ProductValidationTests(unittest.TestCase):
         self.assertEqual({item["id"] for item in facility["unresolved_dimensions"]
                           if item["source"] == "facility"},
                          {"facility-structure", "facility-approval-path"})
-        self.assertEqual([item["id"] for item in facility["unresolved_overlays"]], ["evaluation", "security"])
+        self.assertEqual([item["id"] for item in facility["unresolved_overlays"]], ["accessibility", "evaluation", "security"])
 
         process = catalog.compose("process", [], absent_tags=["cross-team-handoff"], readiness=True)
         self.assertIn("process-handoff-evidence", index(process["inapplicable_dimensions"]))

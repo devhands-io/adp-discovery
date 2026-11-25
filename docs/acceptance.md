@@ -135,3 +135,16 @@ models, and the v3 artifact and readiness workflow.
 | Combined profile | Facility with a separately scoped operating process includes both sets of domain questions and one copy of each applicable overlay. |
 | Saved rounds and exports | A fresh CLI process reads the saved frontier. The two export formats share revision, digest, and status. All three model forms cite ledger IDs, and the legal redline case skips a new model. |
 | Fresh-host pilot | With explicit approval to start each live interview, follow the pilot rubric and record relevance, repeated prompts, what the host needs to resume, and any missed domain or evidence questions. Score host behavior separately from fixture outcomes. |
+
+## Milestone 8 expansion and skill evaluation
+
+Use the [release checklist](releases.md) and the following fictional guide scenario. Evaluate in fresh Desktop chats using disposable workspace state. Record pass, partial or fail with a prompt or record ID. The automated checks exercise catalog behavior; score the live workflow after approval to start an interview.
+
+| Skill | Input and observable outcome |
+| --- | --- |
+| Interview | A library maintains a visitor guide. Ask who resolves conflicts between the branch bulletin and the central directory. With an identified screen-reader barrier, the task-completion question applies. After confirmation, resume the saved next question in a fresh chat without repeating it. |
+| Investigate | Supply a dated branch closure notice contradicting a confirmed opening-time decision. Link the evidence, reopen the decision, preserve the original text and keep the saved question batch. |
+| Define requirements | After the stakeholder confirms who issues corrections, derive a requirement with an observable reader-notification check. Flag the opening-time decision while it remains disputed. |
+| Model product | Given separately owned publication and correction steps, represent their handoff and cite ledger IDs. If all ownership is already clear and no model helps, record the reason to skip it. |
+
+To exercise independent composition, add a facility as a secondary product only when physical work is also in scope. Both products then share one Accessibility question. A process-only profile excludes that overlay; an unknown barrier in a guide remains unresolved. A facility's circulation question remains under facility ownership.

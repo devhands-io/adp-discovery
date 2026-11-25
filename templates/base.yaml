@@ -7,6 +7,7 @@ readiness_criteria:
     role: stakeholder
     on_failure: block
 tags:
+  access-barriers: People in scope encounter a sensory, mobility, or cognitive barrier when using the deliverable.
   sensitive-data: The product handles sensitive information.
   external-actions: The discovery scope includes actions the product performs or directs on external systems, people, or assets. Consider the authorization needed for those actions.
   repeatable-quality: The product needs repeatable evaluation against defined outcomes.

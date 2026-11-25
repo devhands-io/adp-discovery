@@ -177,3 +177,29 @@ The artifact bundle renders them with confidence rationale and trace links.
 Earlier workspaces use revision-linked Markdown outputs. Modeling uses a
 representation suited to the product and can be skipped.
 See the [workspace and artifact contract](supporting-skills.md).
+
+## Catalog evolution
+
+The repository release identifier lives in `VERSION`. Template format v1,
+workspace formats v1–v3, and artifact bundle format v1 have separate version
+fields. A template's version identifies its grammar. The definitions in a
+confirmed snapshot preserve its content across releases.
+
+Authors can compare two valid catalogs with
+`python -m src.adp_discovery --templates NEW validate --against OLD`.
+The comparison checks template roles, tag definitions, applicability, entry
+ownership and relative order, questions, required flags, and readiness policy.
+It accepts a new product, new tags, and optional questions. New criteria,
+required additions to existing templates, and mandatory work in a new overlay
+require review. It conservatively flags wording and rule rewrites even if an
+author believes they are equivalent. It does not evaluate stakeholder meaning.
+New optional overlays can add unresolved or excluded entries to fresh snapshots.
+
+For migration, retain published IDs and their meanings. Introduce additive
+entries with fresh IDs. For a proposed removal, rename, role change or changed
+obligation, obtain explicit approval, document the old-to-new mapping, and
+test old state, fresh composition, and a newly confirmed profile. Never rewrite
+past snapshots or evidence links to substitute a new ID. V1 keeps its original
+checklist. In v2 and v3, adopt changed definitions by appending a confirmed
+profile. State format changes use the explicit upgrade command. Unsupported
+template formats fail validation before a catalog-based initialization writes state.

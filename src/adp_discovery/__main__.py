@@ -15,9 +15,11 @@ from .state import initialize, initialize_draft, load_state, save, upgrade
 
 def parser():
     cli = argparse.ArgumentParser(prog="adp-discovery")
+    cli.add_argument("--version", action="version", version=(ROOT / "VERSION").read_text().strip())
     cli.add_argument("--templates", type=Path, default=ROOT / "templates", help="catalog directory")
     commands = cli.add_subparsers(dest="command", required=True)
-    commands.add_parser("validate", help="validate the catalog")
+    validate = commands.add_parser("validate", help="validate the catalog")
+    validate.add_argument("--against", type=Path, metavar="OLD_TEMPLATES", help="check existing catalog contracts")
     commands.add_parser("catalog", help="list supported products and tags")
     for name in ("compose", "profile", "init"):
         command = commands.add_parser(name, help={
@@ -92,6 +94,8 @@ def run(options):
 
     catalog = Catalog(options.templates)
     if options.command == "validate":
+        if options.against:
+            catalog.check_compatibility(Catalog(options.against))
         return "Catalog valid.\n"
     if options.command == "catalog":
         return {"products": sorted(catalog.products), "tags": catalog.tags}

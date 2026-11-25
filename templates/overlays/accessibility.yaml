@@ -1,0 +1,12 @@
+version: 1
+id: accessibility
+applies:
+  all:
+    - any:
+        - product: reference-guide
+        - product: facility
+    - tag: access-barriers
+dimensions:
+  - id: accessible-task-completion
+    question: Which task encounters an access barrier, what alternative lets the person complete it, and who has tried it?
+    required: false

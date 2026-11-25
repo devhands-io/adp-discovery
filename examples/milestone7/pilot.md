@@ -45,9 +45,9 @@ domain-specific gate and unresolved risk blocking.
 
 | Pilot | Initial active / unresolved / excluded dimensions | Ready active / unresolved / excluded dimensions | Largest saved batch |
 | --- | --- | --- | --- |
-| Facility | 9 / 1 / 5 | 10 / 0 / 5 | 1 |
-| Process | 14 / 0 / 0 | 14 / 0 / 0 | 1 |
-| Contract | 13 / 0 / 2 | 13 / 0 / 2 | 1 |
+| Facility | 10 / 1 / 5 | 11 / 0 / 5 | 1 |
+| Process | 14 / 0 / 1 | 14 / 0 / 1 | 1 |
+| Contract | 13 / 0 / 3 | 13 / 0 / 3 | 1 |
 
 A separate CLI process reopens the draft, the classified interview, and the
 pending evidence question for each pilot using the saved workspace alone.

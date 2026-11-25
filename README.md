@@ -9,6 +9,8 @@ can load its skills. Turn an early idea into a reviewable discovery
 brief with confirmed decisions, open questions, and a preliminary readiness
 assessment.
 
+Current version **0.1.0**. See the [release installation and update guide](docs/releases.md) and the [catalog review](docs/catalog-review.md).
+
 ## Skills
 
 | Skill | When to use it | What it produces |

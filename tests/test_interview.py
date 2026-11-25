@@ -123,7 +123,7 @@ class InterviewTests(unittest.TestCase):
                 item.update(status="resolved", resolution=record["text"], refs=[record["id"]])
         self.state = save(self.path, self.state)
         profile = self.state["profiles"][-1]
-        self.assertEqual(profile["inapplicable_overlays"], ["security"])
+        self.assertEqual(profile["inapplicable_overlays"], ["accessibility", "security"])
         findings = {item["dimension"]: item["status"] for item in readiness(self.state)["findings"]}
         self.assertEqual(findings["information-handling"], "inapplicable")
         self.assertEqual(self.state["profiles"][0], prior["profiles"][0])

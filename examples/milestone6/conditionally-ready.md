@@ -1,7 +1,7 @@
 # Synthetic handoff skill
 
 Project `synthetic-handoff` · State v3 · Revision 1
-State digest `f03255e4690e44f08a199497321182c9f9f3aa35c2d3249dd886a5eab8ae3c44`
+State digest `5775ac3df3688315a59ba342218c9b835949834c08941cc4ab6a8ff1d8ad0732`
 
 ## Discovery brief
 
@@ -61,6 +61,7 @@ No open questions recorded.
 - **Inform** · `adjacent-skills` · Coverage needs a confirmed decision and supported finding backed by evidence for this dimension.
 - **Pass** · `evaluation-cases` · A supported decision covers the dimension. · `evaluation-decision`
 - **Pass** · `acceptance-owner` · A supported decision covers the dimension. · `evaluation-decision`
+- **Excluded** · `accessible-task-completion` · The dimension is inapplicable.
 - **Excluded** · `authority` · The dimension is inapplicable.
 - **Excluded** · `information-handling` · The dimension is inapplicable.
 - **Pass** · `baseline-review` · Template `general` · The stakeholder reviews the discovery baseline and its supporting evidence. · `record-baseline-review`

@@ -30,3 +30,11 @@
 
 Expand the catalog in reviewed batches and introduce migrations when the
 contracts change.
+
+## Milestone 8
+
+| Decision | Rationale and trade-off |
+| --- | --- |
+| Start at 0.1.0 and increment the patch component by default | Only an explicit decision increases a parent component. Release numbering is independent of schema versions and approval for breaking changes. |
+| Ship reference-guide and Accessibility as separate catalog additions | Source authority and correction ownership belong to the guide. A barrier to completing a task can arise in a guide or a facility. The optional overlay preserves earlier mandatory coverage. |
+| Compare authored catalog definitions before an update | Conservative comparison surfaces changed meaning, ordering and mandatory work for review. Existing state continues to use its saved snapshots. |

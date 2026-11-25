@@ -205,6 +205,36 @@ class Catalog:
                 ):
                     raise DiscoveryError(f"{location}: baseline-review must be an unconditional base review")
 
+    def check_compatibility(self, previous):
+        """Reject changes to established definitions and new mandatory work on old profiles."""
+        changes = []
+        for tag, description in previous.tags.items():
+            if self.tags.get(tag) != description:
+                changes.append(f"tag {tag}: removed or changed")
+        for old_group, new_group in ((previous.products, self.products), (previous.overlays, self.overlays)):
+            for name, old in old_group.items():
+                if name not in new_group:
+                    changes.append(f"{name}: template removed or changed role")
+                    continue
+                new = new_group[name]
+                if old.get("applies") != new.get("applies"):
+                    changes.append(f"{name}: applicability changed")
+                for field in ("dimensions", "readiness_criteria"):
+                    old_entries = old.get(field, [])
+                    old_ids = {entry["id"] for entry in old_entries}
+                    new_entries = new.get(field, [])
+                    if [entry for entry in new_entries if entry["id"] in old_ids] != old_entries:
+                        changes.append(f"{name}: existing {field} removed, reordered or changed")
+                    for entry in new_entries:
+                        if entry["id"] not in old_ids and entry.get("required", True):
+                            changes.append(f"{name}: new obligation {entry['id']}")
+        for name in self.overlays.keys() - previous.overlays.keys():
+            overlay = self.overlays[name]
+            if overlay.get("readiness_criteria") or any(item["required"] for item in overlay["dimensions"]):
+                changes.append(f"{name}: new overlay can impose obligations on existing profiles")
+        if changes:
+            raise DiscoveryError("Catalog compatibility review required:\n" + "\n".join(sorted(changes)))
+
     def compose(self, product, tags, *, secondary_products=(), partial=False, absent_tags=(),
                 snapshot=False, readiness=False):
         """Compose a confirmed checklist or inspect applicability with partial tag facts."""

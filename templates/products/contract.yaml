@@ -1,0 +1,34 @@
+version: 1
+id: contract
+dimensions:
+  - id: contract-parties-authority
+    question: Who are the parties and proposed signatories, and how is each signatory's authority established?
+    required: true
+  - id: contract-obligations-acceptance
+    question: Who owes each service or deliverable, what triggers it, when is it due, and what records acceptance?
+    required: true
+  - id: contract-payment-changes
+    question: What triggers payment, and how are price and scope changes agreed and recorded?
+    required: true
+  - id: contract-remedies-exit
+    question: What outcomes should follow a missed obligation, dispute, expiry, or early exit?
+    required: true
+  - id: contract-jurisdiction-review
+    question: Which jurisdiction and material clauses need qualified legal review before drafting or before signature, and who owns each review?
+    required: true
+  - id: contract-delegation-evidence
+    question: Which authority record covers the proposed signer, the scope of delegation, and any limits or expiry?
+    required: true
+    applies: {tag: delegated-signature}
+readiness_criteria:
+  - id: contract-drafting-handoff-review
+    description: Review drafting completeness, confirmed terms, sequencing of legal review, and the remaining review before signature. Readiness applies to drafting handoff.
+    kind: review
+    role: drafting-owner
+    on_failure: block
+  - id: contract-material-legal-review
+    description: Qualified legal counsel records a disposition for each material issue affecting drafting. Legal validity and enforceability require qualified legal review of the eventual agreement.
+    kind: review
+    role: qualified-legal-reviewer
+    on_failure: block
+    applies: {tag: material-legal-issue}

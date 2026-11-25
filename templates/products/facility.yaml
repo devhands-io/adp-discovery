@@ -1,0 +1,29 @@
+version: 1
+id: facility
+dimensions:
+  - id: facility-existing-conditions
+    question: What site, building, and utility conditions constrain the work, and what records establish them?
+    required: true
+  - id: facility-space-use
+    question: Which activities and occupants need space, and which spaces must connect or stay apart?
+    required: true
+  - id: facility-access-circulation
+    question: Which routes must occupants, visitors, and service teams be able to use, and what evidence shows the routes are feasible?
+    required: true
+  - id: facility-operations
+    question: Which services must continue during the work, and what disruption can occupants and operators accommodate?
+    required: true
+  - id: facility-structure
+    question: What does a condition survey or qualified assessment establish about the affected structure?
+    required: true
+    applies: {tag: structural-work}
+  - id: facility-approval-path
+    question: Which owner or external approvals are dependencies, and what source establishes the approval path and responsible authority?
+    required: true
+    applies: {tag: facility-approval}
+readiness_criteria:
+  - id: facility-design-handoff-review
+    description: Review site constraints, circulation, safety questions, continuity of operations, and applicable approval dependencies for design handoff.
+    kind: review
+    role: facilities-reviewer
+    on_failure: block

@@ -1,0 +1,62 @@
+title: Renovate an existing community center
+intent: Renovate the identified Maple Street center for neighborhood classes and accessible public meetings while keeping the library annex open.
+scope: Design handoff for renovation of an identified facility. Site acquisition, leasing, new construction, and authorization to begin work are outside the handoff.
+scope_topics: [site]
+classification:
+  tags: [facility-approval]
+  absent: [structural-work, sensitive-data, external-actions, repeatable-quality]
+  unknown_at_first: [facility-approval]
+  confirmation: The sponsor confirms a facility renovation with public plans and no delegated control of external systems or assets. The partition changes are nonstructural. Only the owner approval path remains to be verified.
+gap: approval
+gap_question: Does the owner require approval before detailed design?
+topics:
+  site:
+    dimensions: [purpose, scope, constraints, facility-existing-conditions, facility-operations]
+    source: Facility condition survey rev 2, pp. 2–4, and library operating calendar, week 12
+    observation: The annex shares the existing utility supply. The survey identifies the partition as nonstructural, and the library remains open during the proposed work.
+    decision: Renovate the existing center without structural changes or interruption to the library annex's public hours or utility service.
+  route:
+    dimensions: [stakeholders, success, facility-space-use, facility-access-circulation]
+    source: Joint site walk record, items 2–4, and measured circulation plan rev 2, sheet A1
+    observation: The east public entrance connects to the proposed shared room and accessible restroom. The west delivery route is reserved for service traffic.
+    decision: Use the east entrance for the public route to the shared room and restroom. Keep deliveries on the west route.
+  approval:
+    dimensions: [facility-approval-path]
+    source: Owner alteration procedure, section 3, and facilities office clarification F-12
+    observation: The owner requires a concept submission to the facilities office before detailed design is commissioned.
+    decision: Send the concept package to the facilities office for owner approval before commissioning detailed design.
+requirement:
+  topic: route
+  text: Provide a continuous accessible public route from the east entrance to the shared room and accessible restroom during public use.
+  justification: The selected public circulation path must serve meeting and class attendees while delivery traffic uses the west side.
+  outcome: The route inventory and measured concept plan show an uninterrupted path linking all three points without crossing the west delivery zone.
+  method: Compare the circulation plan against findings from the site walk.
+additional_requirement:
+  topic: site
+  text: Maintain library annex public hours and utility service during the renovation.
+  justification: The annex depends on shared service and is committed to staying open.
+  outcome: The proposed works schedule preserves published hours and states how the shared service is maintained during each phase.
+  method: Review the works schedule with the library operator against the operating calendar and survey.
+conflict:
+  source: Contractor logistics sketch rev 3, note 7
+  observation: The east entrance is shown as closed throughout renovation.
+  resolution_source: Corrected logistics sketch rev 4, note 7, and sponsor confirmation
+  resolution: The proposed east closure is outside public hours only. The east entrance remains the agreed route during public use.
+risk:
+  dimension: facility-access-circulation
+  text: A new transfer-beam proposal affects the agreed route. Structural condition and safe access are unverified.
+  source: Late design option sketch L-4, beam callout
+  observation: The alternate route proposal includes a change affecting a transfer beam. No structural assessment accompanies the sketch.
+  adds_tag: structural-work
+  criterion: facility-design-handoff-review
+reviews:
+  baseline-review: [Community center sponsor, Sponsor handoff minutes item 4, Accepts the agreed scope and evidence for design handoff.]
+  facility-design-handoff-review: [Facilities lead, Facilities concept review F-18 items 1–5, Confirms site constraints and continuity measures are documented and the owner's approval dependency is assigned.]
+model:
+  purpose: Show how the public route connects required spaces while keeping service traffic separate.
+  representation: Space adjacency and circulation table
+  columns: [From, To, Relationship, Evidence and decision]
+  rows:
+    - [East entrance, Shared room, Continuous accessible public route, "route-source, route-decision"]
+    - [Shared room, Accessible restroom, Connected by the public route, "route-source, route-decision"]
+    - [West delivery entrance, Public circulation, Separate during public hours, "route-source, route-decision"]

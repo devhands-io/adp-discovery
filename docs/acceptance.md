@@ -20,7 +20,7 @@ of the interview in an agent host that can load the skill.
 
 | Scenario | Acceptance condition |
 | --- | --- |
-| Versioned catalog | All four templates declare version 1. Validation identifies the template and field when a version is missing or unsupported, or when a rule uses an invalid shape or reference. |
+| Versioned catalog | Every template declares version 1. Validation identifies the template and field when a version is missing or unsupported, or when a rule uses an invalid shape or reference. |
 | Multiple products | A fixture catalog composes the base, primary product, secondary products in input order, and applicable overlays in filename order. A secondary product can satisfy an overlay rule. Every dimension identifies its source template. |
 | Overlapping declarations | Repeated dimension IDs identify both declarations. Incompatible definitions identify the fields that differ. Duplicate template IDs and repeated product selections fail validation. |
 | Partial tag facts | For `agent-skill` with undeclared tags, Evaluation applies and Security is unresolved. Declaring either Security tag present applies Security. Declaring both absent excludes it. Contradictory declarations fail with a message naming the tag. |
@@ -118,3 +118,20 @@ the meeting decision register through explicit migration to v3.
 | Product and overlay policy | Applicable, excluded, and unknown criteria are visible. An approval has the configured role and current subject. Live catalog edits leave an earlier export reproducible. |
 | Authorized conditions | A conditional result has a current stakeholder-authorized owner, rationale, and completion condition. Missing or stale authorization blocks. |
 | Compatibility | V1 and v2 reports keep their earlier formats. Migration retains records and shows gaps for unavailable findings, criteria, and approvals. |
+
+## Milestone 7 product-agnostic validation
+
+Replay the [facility, process, and contract pilots](../examples/milestone7/pilot.md).
+The replay covers sourced classification and applicability, saved interview
+rounds, investigation, two traceable obligations per product, optional
+models, and the v3 artifact and readiness workflow.
+
+| Scenario | Acceptance condition |
+| --- | --- |
+| Facility renovation | Unresolved owner approval applicability blocks with an empty frontier. An alternate structural option activates a required condition assessment. The facilities reviewer gates design handoff. |
+| Invoice exception process | Evaluation and Security apply. Missing handoff ownership and a critical payment-control gap block. A noncritical replay gap is conditional only with a current stakeholder authorization and all mandatory reviews. |
+| Services agreement | Security applies to restricted access records. Missing delegation evidence blocks when delegated authority applies. A material issue affecting drafting requires a current qualified legal review. The exports identify drafting handoff and the separate pre-signature review. |
+| Contradictions | Each affected decision reopens, the linked obligation loses support, and reconciliation preserves both reports and the clarification. |
+| Combined profile | Facility with a separately scoped operating process includes both sets of domain questions and one copy of each applicable overlay. |
+| Saved rounds and exports | A fresh CLI process reads the saved frontier. The two export formats share revision, digest, and status. All three model forms cite ledger IDs, and the legal redline case skips a new model. |
+| Fresh-host pilot | With explicit approval to start each live interview, follow the pilot rubric and record relevance, repeated prompts, what the host needs to resume, and any missed domain or evidence questions. Score host behavior separately from fixture outcomes. |

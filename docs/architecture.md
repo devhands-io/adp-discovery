@@ -43,6 +43,13 @@ their filenames. Template and dimension IDs use lowercase kebab-case and are
 globally unique within the catalog. Repeated dimensions fail validation even
 when their definitions agree or their conditions are mutually exclusive.
 
+The specialized catalogs include `facility`, `process`, and `contract`.
+Select a secondary template when a distinct deliverable is in scope. Reuse
+applicable overlays for shared concerns and keep questions about domain
+obligations in their product template. Evaluate `external-actions` against
+actions the discovered product performs or directs. Effects of downstream
+implementation or performance are evaluated in their own discovery scope.
+
 A dimension declares an `id`, a `question`, a Boolean `required` flag, and
 an optional `applies` rule. A dimension applies only when both its template
 and its own rule apply. With no dimension rule, it follows its template.
@@ -150,6 +157,12 @@ provide required reviews and approvals. Agents assess evidence quality,
 materiality, and justification. Each artifact references the same source
 revision, and Markdown renders the JSON bundle. The [artifact contract](discovery-artifacts.md)
 defines the schemas, policy, and workflow.
+
+Product reviews define the handoff under assessment. For example, facilities
+review supports design handoff and the contract review supports drafting
+handoff. The contract template requires a separate qualified review when a
+material issue needs disposition before drafting. Document any review of the
+eventual agreement and its sequencing before signature in the baseline.
 
 ## Supporting skills
 

@@ -1,0 +1,72 @@
+title: Facilities maintenance service agreement
+intent: Agree the commercial and service obligations for drafting a maintenance agreement for the Maple Street community center.
+scope: Readiness applies to drafting handoff. Qualified legal review of the completed draft is required before signature. Legal validity and enforceability require qualified legal review of the eventual agreement.
+scope_topics: [terms, legal]
+classification:
+  tags: [delegated-signature, material-legal-issue, sensitive-data]
+  absent: [external-actions, repeatable-quality]
+  confirmation: Procurement confirms a services agreement with a delegated signer, a material clause question before drafting, and a restricted site access register. The agreement records obligations. Administration of maintenance and evaluation of ongoing service performance are outside this discovery scope.
+gap: delegation
+topics:
+  terms:
+    dimensions: [purpose, scope, stakeholders, contract-parties-authority, contract-payment-changes, contract-remedies-exit]
+    source: Commercial term sheet rev 2 items 1–2 and 5–8
+    observation: The center commissions a supplier for corrective work. Payment follows accepted work. Both parties sign change orders, and persistent failure follows the agreed notice and exit process.
+    decision: Draft an agreement between the center and the maintenance supplier with payment after acceptance, signed change orders, and a notice and exit process for persistent failure.
+  acceptance:
+    dimensions: [success, contract-obligations-acceptance]
+    source: Joint service schedule rev 2 steps 2–5
+    observation: A reported fault triggers a supplier work order. The supplier sends the completion record within two business days of finishing the job. The facilities lead accepts or returns it.
+    decision: Require the supplier to submit completion evidence within two business days of finishing each work order and the facilities lead to record acceptance or return.
+  legal:
+    dimensions: [constraints, contract-jurisdiction-review]
+    source: Fictional counsel issue register L-03 items 1–2 and procurement handoff checklist step 4
+    observation: Counsel records a drafting instruction for the liability clause and assigns review of the final jurisdiction wording and complete draft before signature.
+    decision: Draft to the recorded liability instruction and route the jurisdiction wording and completed agreement to qualified counsel before signature.
+  access:
+    dimensions: [authority, information-handling]
+    source: Center access-record management policy AC-2 sections 3–4
+    observation: Named supplier technicians appear in a restricted register. The facilities access manager authorizes access and retains records under the center policy.
+    decision: Limit the register to authorized facilities staff, require manager approval for supplier entries, and follow the access policy's retention rules.
+  delegation:
+    dimensions: [contract-delegation-evidence]
+    source: Delegation register 2026-04 record D-8, signer, cap and expiry fields
+    observation: The director delegates maintenance contracting authority to the procurement lead within the recorded cap and expiry. This proposed procurement is within the cap.
+    decision: List the procurement lead as proposed signer and recheck the recorded scope, cap, and expiry before signature.
+requirement:
+  topic: acceptance
+  text: Specify a supplier completion record due within two business days of work completion and a recorded acceptance or return by the facilities lead.
+  justification: The agreed acceptance obligation defines who provides completion evidence and who determines acceptance.
+  outcome: A sample completed work order can be traced to a draft clause naming the supplier, completion trigger, two-business-day deadline, completion record, and facilities lead's disposition.
+  method: Compare the service schedule and a sample work order with the drafting checklist.
+additional_requirement:
+  topic: legal
+  text: Route the completed agreement and its jurisdiction wording to qualified legal counsel before signature.
+  justification: The liability drafting instruction leaves the wording and the completed agreement for separate pre-signature review.
+  outcome: The signature handoff checklist requires a recorded qualified review of the specific draft and jurisdiction wording.
+  method: Compare the signature handoff checklist to the counsel issue register.
+conflict:
+  source: Procurement onboarding brief rev 3, paragraph 7
+  observation: The brief allows five business days for supplier completion evidence.
+  resolution_source: Joint procurement and supplier clarification, item 2
+  resolution: Two business days governs completion evidence. The five-day window applies to an unrelated onboarding form.
+risk:
+  dimension: contract-jurisdiction-review
+  text: Incompatible liability and jurisdiction terms in a new supplier redline require qualified legal review before drafting can proceed.
+  source: Supplier redline rev 4 sections 11 and 14
+  observation: The new redline replaces the liability language and adds a competing jurisdiction term. Qualified counsel has yet to record a disposition for this change.
+  criterion: contract-material-legal-review
+  model_skip: The obligation matrix cannot settle the supplier's liability or jurisdiction redline. The new drafting question requires counsel's judgment, and the earlier matrix still explains the supported service obligations.
+reviews:
+  baseline-review: [Procurement sponsor, Drafting handoff minutes item 3, Accepts the confirmed obligations and the separate pre-signature review step.]
+  contract-drafting-handoff-review: [Drafting lead, Drafting checklist C-12 items 1–8, Confirms drafting completeness and records qualified legal review of the completed agreement before signature.]
+  contract-material-legal-review: [Fictional qualified counsel, Counsel issue register L-03 item 1, Records drafting disposition of the material liability question and the remaining pre-signature legal review.]
+  information-handling-approval: [Facilities access manager, Access review C-13, Approves restricted register handling and the supplier entry process.]
+model:
+  purpose: Make the obligation, acceptance decision, and relationship to payment explicit.
+  representation: Obligation matrix
+  columns: [Party, Trigger, Duty, Proof and consequence, Evidence and decision]
+  rows:
+    - [Supplier, Work completed, Submit completion record within two business days, Record sent to the facilities lead for review, "acceptance-source, acceptance-decision"]
+    - [Center facilities lead, Completion record received, Record acceptance or return, Disposition establishes whether work is accepted, "acceptance-source, acceptance-decision"]
+    - [Center procurement, Work accepted, Follow agreed payment terms, Acceptance supports payment processing, "terms-source, terms-decision"]

@@ -86,30 +86,30 @@ class CatalogTests(unittest.TestCase):
 
     def test_unknown_classification_is_rejected(self):
         with self.assertRaisesRegex(DiscoveryError, "unknown product"):
-            self.catalog.compose("building", [])
+            self.catalog.compose("unlisted-product", [])
         with self.assertRaisesRegex(DiscoveryError, "unknown tags"):
             self.catalog.compose("general", ["typo"])
 
     def test_secondary_products_follow_input_order_and_can_activate_overlays(self):
         self.add_product("artifact", id="artifact-format", question="Which format?", required=True)
-        self.add_product("process", id="process-owner", question="Who owns the process?", required=False)
-        self.change_template("base.yaml", lambda data: data["dimensions"][0].update(applies={"product": "process"}))
+        self.add_product("policy", id="policy-owner", question="Who owns the policy?", required=False)
+        self.change_template("base.yaml", lambda data: data["dimensions"][0].update(applies={"product": "policy"}))
         catalog = Catalog(self.path)
 
-        profile = catalog.compose("artifact", [], secondary_products=["process", "agent-skill"])
-        self.assertEqual(profile["secondary_products"], ["process", "agent-skill"])
+        profile = catalog.compose("artifact", [], secondary_products=["policy", "agent-skill"])
+        self.assertEqual(profile["secondary_products"], ["policy", "agent-skill"])
         self.assertEqual(profile["overlays"], ["evaluation"])
         self.assertEqual(
             [dimension["source"] for dimension in profile["dimensions"]],
-            ["general"] * 5 + ["artifact", "process"] + ["agent-skill"] * 4 + ["evaluation"] * 2,
+            ["general"] * 5 + ["artifact", "policy"] + ["agent-skill"] * 4 + ["evaluation"] * 2,
         )
         self.assertEqual(profile["dimensions"][0]["id"], "purpose")
-        reversed_profile = catalog.compose("artifact", [], secondary_products=["agent-skill", "process"])
+        reversed_profile = catalog.compose("artifact", [], secondary_products=["agent-skill", "policy"])
         self.assertEqual(reversed_profile["dimensions"][5]["id"], "artifact-format")
         self.assertEqual(reversed_profile["dimensions"][6]["id"], "invocation")
         self.assertNotIn("purpose", [item["id"] for item in catalog.compose("general", [])["dimensions"]])
-        general = catalog.compose("general", [], secondary_products=["process"])
-        self.assertEqual([dimension["source"] for dimension in general["dimensions"]], ["general"] * 5 + ["process"])
+        general = catalog.compose("general", [], secondary_products=["policy"])
+        self.assertEqual([dimension["source"] for dimension in general["dimensions"]], ["general"] * 5 + ["policy"])
 
     def test_invalid_secondary_products_and_tag_facts(self):
         for options, message in (

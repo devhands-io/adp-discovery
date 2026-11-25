@@ -1,0 +1,30 @@
+version: 1
+id: process
+dimensions:
+  - id: process-entry-exit
+    question: What starts a case, and what must be true before the work can be closed?
+    required: true
+  - id: process-responsibilities
+    question: Who owns the work at each step, and who decides how a case is resolved?
+    required: true
+  - id: process-exceptions
+    question: Which exceptions change the normal path, and who resolves or escalates them?
+    required: true
+  - id: process-workload-targets
+    question: What do case volumes and delays show, and what service outcome should the process meet?
+    required: true
+  - id: process-handoff-evidence
+    question: Which teams own each side of the handoff, and what record shows that the receiving team accepted it?
+    required: true
+    applies: {tag: cross-team-handoff}
+readiness_criteria:
+  - id: process-controls-review
+    description: Review ownership, handoffs, and escalation controls for the operating process.
+    kind: review
+    role: process-owner
+    on_failure: block
+  - id: process-case-replay
+    description: Assess a representative walkthrough of normal and exception paths and record any remaining verification gap.
+    kind: assessment
+    role: process-reviewer
+    on_failure: condition

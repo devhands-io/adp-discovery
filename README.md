@@ -239,6 +239,9 @@ project brief to discover the framework's first interview skill. Replay its
 You can also open the [generated pilot baseline](examples/self-discovery/baseline.md).
 The [meeting decision register pilot](examples/meeting-notes/pilot.md) replays
 a v2 interview from draft through conflict resolution.
+The [Milestone 7 pilots](examples/milestone7/pilot.md) replay v3 discovery for
+an existing facility renovation, an invoice exception process, and a services
+agreement. They generate the canonical artifacts and separate optional models.
 For more detail, see the [interview workflow reference](.agents/skills/interview/references/workflow.md),
 [state and CLI reference](.agents/skills/interview/references/state.md),
 [architecture](docs/architecture.md), and [decision log](docs/decisions.md).

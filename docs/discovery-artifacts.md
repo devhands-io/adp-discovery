@@ -81,9 +81,11 @@ dimensions determine applicability. A `dimension` check names a dimension in
 its template or the base. An `assessment`, `review`, or `approval` names
 the required role. Reviews and approvals are mandatory when applicable.
 Reserve `baseline-review` for the unconditional stakeholder review in the
-base. Currently the agent-skill profile adds a handoff replay assessment,
-Evaluation adds a plan review, and Security adds an information-handling
-approval.
+base. The agent-skill profile adds a handoff replay assessment. Facility
+adds a design handoff review. Process adds a controls review and a case
+replay assessment. Contract adds a drafting handoff review and a qualified
+legal review when a material issue affects drafting. Evaluation adds a plan
+review, and Security adds an information-handling approval.
 
 | Outcome | Rule |
 | --- | --- |

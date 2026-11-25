@@ -8,8 +8,13 @@ readiness_criteria:
     on_failure: block
 tags:
   sensitive-data: The product handles sensitive information.
-  external-actions: The product can affect systems, people, or assets outside its workspace.
+  external-actions: The discovery scope includes actions the product performs or directs on external systems, people, or assets. Consider the authorization needed for those actions.
   repeatable-quality: The product needs repeatable evaluation against defined outcomes.
+  structural-work: The facility scope includes changes affecting the structure.
+  facility-approval: The facility scope has an owner or external approval dependency.
+  cross-team-handoff: Work in the process passes between independently accountable teams.
+  delegated-signature: Someone will sign the contract under delegated authority.
+  material-legal-issue: A material legal issue needs qualified review before drafting can proceed.
 dimensions:
   - id: purpose
     question: What outcome should the product achieve, and for whom?

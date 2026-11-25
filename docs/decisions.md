@@ -9,7 +9,7 @@
 | Require built-in question dialogs when available | The skill uses the host's input capability and falls back to chat when the session lacks one. Both paths require an explicit reply before the interview acts on an answer. |
 | Store revisioned JSON with a fixed checklist snapshot | A resuming session reads the same scope after a catalog edit. A changed classification starts a new workspace in version 1. |
 | Use a single Markdown export with traceable sections | One artifact is sufficient to review the first slice and can be reproduced directly from state. |
-| Keep generic physical and legal acceptance scenarios | Domain-neutral behavior can be tested now. Specialized building, process, and contract templates follow the agent-skill pilot. |
+| Keep generic physical and legal acceptance scenarios | Domain-neutral behavior can be tested from the first slice. Specialized facility, process, and contract templates follow the agent-skill pilot. |
 | Require version 1 on every template | Catalog formats can evolve independently of saved workspace state. Custom unversioned templates need a version field. |
 | Compose in a fixed order and give each dimension one owner | Base, primary product, ordered secondary products, and filename-ordered overlays give a reproducible checklist with a source for each dimension. Rejecting duplicate IDs prevents implicit overrides. |
 | Preserve unresolved applicability in inspection | Partial tag facts can leave overlays or dimensions unresolved and surface which facts are missing. A confirmed single-product tag set still produces the existing version 1 checklist for workspace initialization. |
@@ -22,10 +22,11 @@
 | Introduce v3 state and a single canonical seven-artifact bundle | Findings and requirements become persistent, typed inputs to traceability and readiness. V1 and v2 keep their report contracts. Markdown renders the same bundle in v3. |
 | Pin readiness policy to the saved profile | Catalog criteria reuse three-valued applicability. New catalog policy takes effect through a confirmed profile snapshot, and earlier exports remain reproducible. |
 | Compute the gate from deterministic checks and sourced judgments | The core can verify links and apply policy. Explicit assessments, reviews, and authorized deferrals are tied to their reviewed content and retained in order. |
+| Validate three non-software products with the existing catalog and v3 state | Facility renovation, invoice exception handling, and a services agreement use distinct dimensions, reviews, and optional models. Evidence triggers reuse three-valued applicability, and shared concerns reuse Evaluation and Security. |
+| Evaluate external actions against the discovered product's scope | Ask what the product itself performs or directs. This distinguishes an operational payment release from construction or contract performance that happens after the handoff being assessed. The existing Security applicability rule and saved profiles are preserved. |
+| Scope the contract readiness gate to drafting handoff | Drafting completeness, disposition of material issues that affect drafting, and review before signature have distinct purposes. Qualified legal review of the eventual agreement covers legal validity and enforceability. |
 
 ## Subsequent slices
 
-1. Add specialized building, process, and contract templates with distinct
-   discovery pilots.
-2. Expand the catalog in reviewed batches and introduce migrations when the
-   contracts change.
+Expand the catalog in reviewed batches and introduce migrations when the
+contracts change.

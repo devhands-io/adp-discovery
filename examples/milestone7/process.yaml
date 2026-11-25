@@ -1,0 +1,73 @@
+title: Resolve supplier invoice exceptions
+intent: Define a repeatable process for Accounts Payable and Procurement to resolve supplier invoice exceptions before payment release.
+scope: Covers invoice intake, discrepancy resolution, escalation, and release authorization. The pilot uses masked sample records.
+scope_topics: [flow, release]
+classification:
+  tags: [cross-team-handoff, external-actions, repeatable-quality]
+  absent: [sensitive-data]
+  confirmation: The sponsor confirms an operating process spanning Accounts Payable and Procurement. This process directs payment release and needs repeatable evaluation. The pilot handles masked records without sensitive fields.
+gap: handoff
+topics:
+  flow:
+    dimensions: [purpose, scope, process-entry-exit, process-exceptions]
+    source: Masked invoice casebook examples A–C and intake policy AP-10 section 2
+    observation: A mismatch starts a case. A missing purchase order is escalated to Procurement. Cases close only after correction or a recorded rejection.
+    decision: Open a case on mismatch, escalate missing orders to Procurement, and close only after recorded correction or rejection.
+  release:
+    dimensions: [stakeholders, constraints, process-responsibilities, authority, information-handling]
+    source: Controller payment control AP-14 rev 2 sections 2–3 and redaction guide section 1
+    observation: The controller authorizes release after discrepancy closure and independent verification. Reviewers use a role-limited case record with supplier banking fields masked.
+    decision: Reserve release authorization for the controller and require independent verification after discrepancy closure. Limit case access to review roles and use masked records for replay.
+  evaluation:
+    dimensions: [success, process-workload-targets, evaluation-cases, acceptance-owner]
+    source: Quarterly masked case log summary and process owner walkthrough plan rows 1–3
+    observation: The log shows a surge at month end. The agreed walkthrough covers corrected invoices, missing orders, and rejection. The process owner accepts cases resolved or escalated within two business days.
+    decision: Resolve or escalate cases within two business days. The process owner reviews the corrected, missing-order, and rejected cases.
+  handoff:
+    dimensions: [process-handoff-evidence]
+    source: Joint AP and Procurement handoff register H-08, acknowledgment and return steps
+    observation: Procurement accepted ownership of missing-order cases until it returns a correction or rejection to Accounts Payable.
+    decision: Assign missing-order work to Procurement on acknowledgment. Accounts Payable retains payment control and receives the disposition.
+requirement:
+  topic: release
+  text: Require recorded controller authorization and independent verification before releasing payment on an invoice with a prior discrepancy.
+  justification: The controller's authority and separation of duties govern payment after a discrepancy.
+  outcome: In a corrected-invoice walkthrough, release stays pending until an independent verification and controller authorization are both recorded.
+  method: Walk through the corrected-invoice case and inspect its control entries.
+additional_requirement:
+  topic: evaluation
+  text: Resolve or escalate each invoice exception within two business days.
+  justification: The agreed target governs both straightforward and unresolved cases.
+  outcome: Intake and disposition timestamps in representative cases show a resolution or escalation within two business days.
+  method: Apply the agreed business-day calendar to the sample case log.
+conflict:
+  source: Shift manager interview, round 3
+  observation: The shift manager says any senior analyst can release a corrected invoice.
+  resolution_source: Controller clarification to AP-14 and process sponsor confirmation
+  resolution: The senior analyst may prepare a release request. Only the controller authorizes release after independent verification.
+risk:
+  dimension: process-responsibilities
+  text: The fallback route allows a payment to proceed without independent verification when the assigned verifier is unavailable.
+  source: Exception walkthrough, outage case P-09
+  observation: The fallback exercise reached payment release with the verification field empty.
+  criterion: process-controls-review
+reviews:
+  baseline-review: [Operations sponsor, Discovery handoff minutes item 3, Accepts the process boundary and confirmed controls.]
+  process-controls-review: [AP process owner, Control walkthrough AP-18 sections 2–4, Confirms receiving ownership and escalation and release controls for the proposed process.]
+  process-case-replay: [Process analyst, "Case replay AP-19 rows 1–4, including the month-end rejection variant", Walkthroughs cover correction and escalation and confirm that a rejection under month-end load meets the service target.]
+  evaluation-plan-review: [AP process owner, Evaluation plan AP-17 cases 1–3, Accepts expected outcomes and review evidence for representative cases.]
+  information-handling-approval: [Controller, Payment and case data review AP-16, "Approves role-limited case access, masked replay records, and controller release authorization."]
+condition:
+  criterion: process-case-replay
+  owner: Process analyst
+  completion: Replay the rejected case with the month-end queue and record the result before rollout.
+  rationale: Normal and escalation cases were covered. The load variant affects service timing and leaves release controls intact.
+  source: Operations sponsor's explicit handoff authorization, meeting item 5
+model:
+  purpose: Show who owns an exception at each handoff and where release control occurs.
+  representation: Swimlane transition table
+  columns: [From lane, Trigger, To lane, Evidence and decision]
+  rows:
+    - [Accounts Payable, Missing purchase order, Procurement acknowledges case, "handoff-source, handoff-decision"]
+    - [Procurement, Correction or rejection recorded, Accounts Payable receives disposition, "handoff-source, handoff-decision"]
+    - [Accounts Payable, Corrected case independently verified, Controller authorizes release, "release-source, release-decision"]

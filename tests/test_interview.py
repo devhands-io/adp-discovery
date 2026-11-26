@@ -90,6 +90,28 @@ class InterviewTests(unittest.TestCase):
         self.assertIn("handling-review", rendered)
         self.assertIn("Check for missing required decisions, unresolved applicability, or recorded blockers.", rendered)
 
+    def test_saved_batch_preserves_other_branches_and_dependencies(self):
+        independent = ["purpose", "scope", "audience", "constraints", "success"]
+        for key in [*independent, "follow-up"]:
+            self.state["records"].append({
+                "id": key, "kind": "question", "status": "open", "text": key,
+                "dimensions": [], "refs": [], "blocking": True,
+                "depends_on": ["scope"] if key == "follow-up" else [],
+            })
+        self.state["frontier"] = independent[:3]
+        save(self.path, self.state)
+        self.command("report", self.path, markdown=True)
+        resumed = self.command("show", self.path)
+        self.assertEqual(resumed["frontier"], independent[:3])
+        self.assertEqual(readiness(resumed)["eligible_questions"], independent)
+
+        scope = next(item for item in resumed["records"] if item["id"] == "scope")
+        scope.update(status="resolved", resolution="Stakeholder settled the boundary.")
+        resumed["frontier"] = ["constraints", "success", "follow-up"]
+        save(self.path, resumed)
+        self.assertEqual(readiness(load_state(self.path))["eligible_questions"],
+                         ["purpose", "audience", "constraints", "success", "follow-up"])
+
     def test_inapplicable_questions_and_deferred_unknowns(self):
         self.play(0)
         self.play(1)

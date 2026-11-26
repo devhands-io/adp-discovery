@@ -29,6 +29,17 @@ question stays open. Confirmation and dependent steps require an explicit
 stakeholder reply. Starting a live pilot requires approval for the interview
 itself. Python commands operate on the resulting workspace state.
 
+Every interview stress-tests the idea. The interviewer checks discoverable
+facts, recommends an answer to each product decision, and pursues material
+consequences after each reply. The ledger holds all identified branches. The
+frontier holds the next one to three related questions. Python validates
+eligibility while the interviewer judges which consequences merit follow-up.
+
+The closing recap records the settled decisions and scope boundaries as a
+question in the ledger. Its resolution links the stakeholder's explicit reply
+to the reviewed content. Recheck the recap against current work on resume.
+Baseline readiness and interview completion can occur at different times.
+
 ## Catalog contract
 
 Every catalog YAML file declares `version: 1`. The template schema version is

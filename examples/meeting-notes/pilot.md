@@ -19,3 +19,30 @@ to continue. Open a fresh thread between rounds and invoke `$interview` with
 the exact workspace path. Verify the thread recovers the current question
 without asking about purpose again. If the stakeholder cannot settle a
 question, verify it stays open and can be deferred.
+
+## Fresh interviewer pilot
+
+Give the interviewer only the two files in `interview-input/`, an isolated
+state path, and the request “Use /interview to grill the idea in the brief.”
+Keep this evaluator guide and the rounds fixture out of the interview input.
+
+Observe whether the interviewer discovers the attribution rule, cites it, and
+asks what the draft should do. As stakeholder, choose to leave the owner
+unassigned. Check whether the interviewer follows the consequence for review
+or publication. Defer one material decision and request a baseline. Resume
+from the state path, settle the remaining questions, and confirm the recap
+only when accurate. Reopen the workspace with a material correction and
+verify the prior confirmation is recoverable and the change needs review.
+Record observed actions separately from fixture replay results.
+
+### Observed forward test
+
+On 2026-11-26, an isolated interviewer read the brief and policy, cited
+the conflicting attribution rule, and proposed a missing-owner decision.
+The checkpoint baseline retained a deferred sharing question. A fresh
+interviewer resumed from state, recorded the chair's reply, and asked about
+conflicting assignments. It obtained explicit recap confirmation while the
+separate handoff assessment remained outstanding. A further fresh interviewer
+preserved that confirmation after a retention correction and requested
+confirmation of the revised recap. This run used a simulated chair and agent
+messages for the questions. Desktop dialog delivery was outside the test.

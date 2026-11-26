@@ -1,6 +1,6 @@
 ---
 name: interview
-description: Start or resume a product discovery interview, reconcile stakeholder answers, or prepare a discovery baseline.
+description: Grill or stress-test a product idea, run or resume a discovery interview, or prepare a reviewable discovery baseline.
 ---
 
 Read and follow `.agents/skills/interview/SKILL.md` from the project root.

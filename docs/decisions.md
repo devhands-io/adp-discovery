@@ -58,3 +58,12 @@ Use Scenario in the viewer. Preserve scenario order and offer the next untried s
 Collect feedback during replay and let the modeler copy it to chat in one batch. Completion and confirmation are independent of note-taking. The preview offers selectable text when clipboard access is unavailable.
 
 Use explicit modeler review of applicable data models before screen design. Check the placement and lifecycle of each agreed fact during coverage review. A successful navigation trace alone cannot reveal a missing article date.
+
+## Product discovery interviews
+
+Use the same decision-grilling workflow for every interview. The catalog
+provides breadth and the stakeholder's answers determine further branches.
+Retain the small saved batch so a stakeholder can resolve related choices
+together. Preserve other questions in the ledger until settled or explicitly
+excluded. Use existing question and evidence records for closing confirmation
+so existing workspaces can resume without migration.

@@ -16,6 +16,20 @@ of the interview in an agent host that can load the skill.
 | Interrupted interview | A separate process or fresh chat loads the saved revision and decision IDs before continuing. An outdated write is rejected and preserves the newer state. |
 | Invalid catalog | Malformed templates, missing rule references, and duplicate dimensions fail with readable messages. Identical classifications yield the same ordered checklist. |
 
+## Interview behavior
+
+Give a fresh interviewer a product brief with a material factual claim and an
+accessible source that conflicts with it. Check that it locates and cites the
+source, distinguishes observed facts from intended behavior, and recommends
+a decision with a reason and consequence. An answer that opens a material
+boundary should produce a follow-up, even in a covered dimension.
+
+Request a baseline while a branch is deferred, then resume from the saved
+state. The interview closes only after all material branches are accounted
+for and the stakeholder confirms the recap. A later material correction
+requires renewed confirmation and preserves the original evidence. See the
+[isolated pilot instructions](../examples/meeting-notes/pilot.md#fresh-interviewer-pilot).
+
 ## Template schema and composition
 
 | Scenario | Acceptance condition |

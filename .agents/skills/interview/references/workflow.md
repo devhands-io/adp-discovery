@@ -21,7 +21,10 @@ available dimension when the original statement applies.
 1. Match the brief and latest replies against existing questions and dimensions.
    Close answered questions with links to their evidence. Ask follow-ups only
    for boundaries or consequences that remain unclear.
-2. Record open questions with stable IDs. Add prerequisites only when their
+2. After each answer, identify the choices it unlocks. Try a concrete boundary
+   case when it could change the decision. Record every material follow-up,
+   including those outside the next batch or in an already covered dimension.
+   Give open questions stable IDs. Add prerequisites only when their
    answers are needed to ask the dependent question meaningfully. Leave a
    classification or applicability question unscoped if it precedes the
    corresponding dimension.
@@ -34,11 +37,20 @@ available dimension when the original statement applies.
    after a relevant change. A dismissed or skipped question stays available
    under its original ID.
 
-Ask neutral questions that expose a consequence or testable assumption. If a
-stakeholder says a team reviews every output, ask who handles exceptions and
-what evidence shows the review happened. Offer choices that represent real
-alternatives and allow the stakeholder's own wording where supported. Defer
-implementation and modeling questions until they affect a discovery decision.
+Before asking for a material fact, check the brief, ledger and accessible
+primary sources, including the implementation when it establishes current
+behavior. Save the finding with a precise source locator. For substantial
+research, use the evidence practices in the [investigation skill](../../investigate/SKILL.md).
+If a check is pending or inconclusive, keep its question open and proceed
+with independent decisions. Ask the stakeholder for facts only they can
+supply. A source describing current behavior can conflict with a factual
+claim while still leaving the intended behavior for the stakeholder to decide.
+
+Ask neutral questions about observations and preferences. For each product
+decision, recommend an answer, explain why, and name the material consequence
+of accepting it. Let the stakeholder accept, amend or reject the proposal.
+When evidence is insufficient, recommend how to resolve the uncertainty.
+Defer implementation and modeling questions until they affect discovery.
 
 ## Interpret and save each round
 
@@ -71,3 +83,22 @@ uncertainty, and link confirmed decisions to their findings. Use the saved
 criteria to identify who needs to review, approve, or authorize a condition.
 Record the explicit outcome and source for the reviewed subject. Readiness
 requires the recorded baseline review and any applicable approvals.
+
+## Close or resume the interview
+
+Inspect the whole ledger, including deferred questions, pending source checks,
+contradictions and reopened decisions. Settle each material in-scope branch
+or record the stakeholder's explicit scope exclusion and reason. A deferral
+pauses that branch. A baseline may be exported and reviewed at any checkpoint.
+
+Once those branches are accounted for, present the settled choices and scope
+boundaries in a concise recap. Ask the stakeholder to confirm that it captures
+their understanding. Save the recap and question before asking. On explicit
+acceptance, resolve the question with a link to sourced evidence identifying
+the recap and the reply. A baseline review can serve both purposes when it
+explicitly covers that recap. On correction, follow the affected branches and
+present a revised recap for confirmation.
+
+On resume, compare the confirmed recap with current decisions, scope and open
+work. Preserve earlier confirmations as history. A material change requires a
+new recap and confirmation; an unrelated save preserves the existing outcome.

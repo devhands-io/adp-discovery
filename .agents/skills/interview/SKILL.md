@@ -1,6 +1,6 @@
 ---
 name: interview
-description: Run or resume a product discovery interview. Use when a stakeholder wants to clarify an idea, confirm discovery decisions, reconcile conflicting answers, or produce a reviewable discovery baseline.
+description: Run or resume a product discovery interview. Use when a stakeholder wants to grill or stress-test a product idea, confirm discovery decisions, reconcile conflicting answers, or produce a reviewable discovery baseline.
 ---
 
 # Discovery interview
@@ -26,8 +26,8 @@ confirming a decision or taking a step that depends on the answer.
 
 1. Find the workspace or start a draft under `.discovery/<slug>/state.json`. On resume, load the saved state, summarize the confirmed decisions and blockers, and use the saved question batch. If several workspaces fit, ask which one to use.
 2. Capture the stated intent and reuse answers from the brief. Propose a product classification from the catalog, use `general` when no specialization fits, and confirm the type and known applicability facts with the stakeholder.
-3. Ask one focused question or a small related batch. Resolve prerequisites and impactful uncertainties first. Record sourced facts, preferences, assumptions, and decisions separately. Only confirm decisions the stakeholder explicitly makes or accepts.
-4. Save each substantive round and the next batch before asking it. Surface conflicting evidence and reopen affected decisions. Revisit an answered question only when new evidence requires it.
-5. Offer baseline review at a natural checkpoint and generate it on request or at that checkpoint. Report gaps and uncertainty. Coverage and an empty batch do not establish stakeholder approval.
+3. Check discoverable facts against accessible sources. For each product decision, present a recommendation, its reasoning, and the consequence of accepting it. Keep recommendations proposed until the stakeholder decides.
+4. After each answer, pursue consequential boundaries and newly enabled decisions. Record all material branches, reopen conflicts, and save the next batch of one to three related questions before asking it.
+5. Generate the baseline on request or at a review checkpoint. To close the interview, settle the material branches and obtain explicit confirmation of the closing recap.
 
 Follow the [interview workflow](references/workflow.md) and [state and CLI reference](references/state.md).
